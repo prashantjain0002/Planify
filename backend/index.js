@@ -4,6 +4,8 @@ import express from "express";
 import mongoose from "mongoose";
 import morgan from "morgan";
 
+import routes from "./routes/index.js";
+
 dotenv.config();
 
 const app = express();
@@ -26,8 +28,11 @@ mongoose
 
 const PORT = process.env.PORT || 5000;
 
+app.use("/api/v1", routes);
+
 app.get("/", async (req, res) => {
   res.send("Hello World!");
 });
+
 
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
