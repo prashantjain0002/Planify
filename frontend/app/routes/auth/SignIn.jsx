@@ -22,6 +22,13 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router";
 
+export function meta({}) {
+  return [
+    { title: "Log In" },
+    { name: "description", content: "Welcome to React Router!" },
+  ];
+}
+
 const SignIn = () => {
   const form = useForm({
     resolver: zodResolver(signInSchema),
@@ -74,7 +81,12 @@ const SignIn = () => {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <div className="flex justify-between items-center">
+                      <FormLabel>Password</FormLabel>
+                      <Link to='/forgot-password' className=" text-blue-500 font-semibold hover:underline hover:text-blue-600 text-sm">
+                        Forgot Password?
+                      </Link>
+                    </div>
                     <FormControl>
                       <Input
                         type="password"

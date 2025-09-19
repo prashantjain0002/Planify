@@ -25,7 +25,7 @@ import { Link } from "react-router";
 
 export function meta({}) {
   return [
-    { title: "Log In" },
+    { title: "Sign Up" },
     { name: "description", content: "Welcome to React Router!" },
   ];
 }
