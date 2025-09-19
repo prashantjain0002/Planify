@@ -21,7 +21,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router";
-
+import { useSignUpMutation } from "@/hooks/useAuth";
+import { toast } from "sonner";
+import { Loader } from "lucide-react";
 
 export function meta({}) {
   return [
@@ -41,8 +43,19 @@ const SignUp = () => {
     },
   });
 
+  const { mutate, isPending } = useSignUpMutation();
+
   const handleOnSubmit = (values) => {
-    console.log(values);
+    mutate(values, {
+      onSuccess: () => {
+        toast.success("Account created successfully");
+      },
+      onError: (error) => {
+        const errorMessage =
+          error?.response?.data?.message || "something went wrong";
+        toast.error(errorMessage);
+      },
+    });
   };
 
   return (
@@ -129,8 +142,14 @@ const SignUp = () => {
                 )}
               />
 
-              <Button type="submit" className="w-full">
-                Sign Up
+              <Button type="submit" className="w-full" disabled={isPending}>
+                {isPending ? (
+                  <>
+                    <Loader className="mr-2 h-4 w-4 animate-spin" />
+                  </>
+                ) : (
+                  "Sign Up"
+                )}
               </Button>
             </form>
           </Form>

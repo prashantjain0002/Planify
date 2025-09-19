@@ -8,6 +8,7 @@ import {
 } from "react-router";
 
 import "./app.css";
+import ReactQueryProvider from "./lib/provider/reactQueryProvider";
 
 export const links = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -42,7 +43,11 @@ export function Layout({ children }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  return (
+    <ReactQueryProvider>
+      <Outlet />
+    </ReactQueryProvider>
+  );
 }
 
 export function ErrorBoundary({ error }) {
