@@ -1,9 +1,21 @@
 import User from "./../models/user.model.js";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import verification from "../models/verification.model.js";
+import { sendEmail } from "../libs/sendEmail.js";
+import aj from "../libs/arcjet.js";
 
 export const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
+
+    const decision = await aj.protect(req, { email, requested: 1 });
+    // console.log("Arcjet decision", decision);
+
+    if (decision.isDenied()) {
+      res.writeHead(403, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ message: "Invalid email address" }));
+    }
 
     const exisitingUser = await User.findOne({ email });
 
@@ -19,6 +31,36 @@ export const registerUser = async (req, res) => {
       email,
       password: hashedPassword,
     });
+
+    const verificationToken = jwt.sign(
+      { userId: newUser._id, property: "email-verification" },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    await verification.create({
+      userId: newUser._id,
+      token: verificationToken,
+      expiresAt: new Date(Date.now() + 1 * 60 * 60 * 1000),
+    });
+
+    //send Email
+    const verificationLink = `${process.env.FRONTEND_URL}/verify-email/${verificationToken}`;
+
+    const emailResult = await sendEmail(
+      newUser.email,
+      "Verify your email address",
+      "views/verifyEmail.ejs",
+      { name: newUser.name, verificationLink }
+    );
+
+    if (!emailResult.success) {
+      return res.status(201).json({
+        message:
+          "User registered successfully, but failed to send verification email.",
+        emailError: emailResult.error,
+      });
+    }
 
     res.status(201).json({
       message:

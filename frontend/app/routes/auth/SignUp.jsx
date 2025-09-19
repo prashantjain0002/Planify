@@ -48,7 +48,7 @@ const SignUp = () => {
   const handleOnSubmit = (values) => {
     mutate(values, {
       onSuccess: () => {
-        toast.success("Account created successfully");
+        toast.success("Account created successfully please verify your email");
       },
       onError: (error) => {
         const errorMessage =
