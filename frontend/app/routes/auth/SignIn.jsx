@@ -1,9 +1,113 @@
-import React from 'react'
+import React from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { signInSchema } from "@/lib/schema";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router";
 
 const SignIn = () => {
-  return (
-    <div>SignIn</div>
-  )
-}
+  const form = useForm({
+    resolver: zodResolver(signInSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
-export default SignIn
+  const handleOnSubmit = (values) => {
+    console.log(values);
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-muted/40 p-4 w-full">
+      <Card className="max-w-md w-full shadow-2xl">
+        <CardHeader className="text-center">
+          <CardTitle className="text-xl font-bold">Welcome Back</CardTitle>
+          <CardDescription className="text-sm text-muted-foreground">
+            Please enter your email and password
+          </CardDescription>
+        </CardHeader>
+
+        <CardContent>
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(handleOnSubmit)}
+              className="space-y-4"
+            >
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email Address</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="email"
+                        placeholder="email@example.com"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="**********"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <Button type="submit" className="w-full">
+                Sign In
+              </Button>
+            </form>
+          </Form>
+        </CardContent>
+
+        <CardFooter>
+          <div className="mx-auto flex items-center justify-center">
+            Don't have an account?
+            <Link
+              to="/sign-up"
+              className="ml-1 text-blue-500 font-semibold hover:underline hover:text-blue-600"
+            >
+              Sign Up
+            </Link>
+          </div>
+        </CardFooter>
+      </Card>
+    </div>
+  );
+};
+
+export default SignIn;
