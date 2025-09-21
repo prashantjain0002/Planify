@@ -46,7 +46,7 @@ export const registerUser = async (req, res) => {
     });
 
     //send Email
-    const verificationLink = `${process.env.FRONTEND_URL}/verify-email/${verificationToken}`;
+    const verificationLink = `${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
 
     const emailResult = await sendEmail(
       newUser.email,

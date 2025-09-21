@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useSignUpMutation } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { Loader } from "lucide-react";
@@ -45,11 +45,20 @@ const SignUp = () => {
 
   const { mutate, isPending } = useSignUpMutation();
 
+  const navigate = useNavigate();
+
   const handleOnSubmit = (values) => {
     mutate(values, {
       onSuccess: () => {
-        toast.success("Account created successfully please verify your email");
+        toast.success("Email Verification Required", {
+          description:
+            "Please check your email for a verification link. If you don't see it, check your spam folder.",
+        });
+
+        form.reset();
+        navigate("/sign-in");
       },
+
       onError: (error) => {
         const errorMessage =
           error?.response?.data?.message || "something went wrong";
