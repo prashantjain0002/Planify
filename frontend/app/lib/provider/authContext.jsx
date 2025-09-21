@@ -8,7 +8,7 @@ const AuthContext = createContext(undefined);
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // start as true
 
   const navigate = useNavigate();
   const currentPath = useLocation().pathname;
@@ -16,7 +16,6 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      setIsLoading(true);
       const userInfo = localStorage.getItem("user");
       if (userInfo) {
         setUser(JSON.parse(userInfo));
@@ -31,22 +30,14 @@ export const AuthProvider = ({ children }) => {
     };
 
     checkAuth();
-  }, []);
-
-  useEffect(() => {
-    const handleLogout = () => {
-      logout();
-      navigate("/sign-in");
-    };
-    window.addEventListener("force-logout", handleLogout);
-    return () => window.removeEventListener("force-logout", handleLogout);
-  }, []);
+  }, [currentPath, isPublicRoute, navigate]);
 
   const login = async (data) => {
     localStorage.setItem("token", data.token);
     localStorage.setItem("user", JSON.stringify(data.user));
     setUser(data.user);
     setIsAuthenticated(true);
+    window.location.replace("/dashboard"); // this will now work reliably
   };
 
   const logout = async () => {
@@ -55,8 +46,12 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setIsAuthenticated(false);
     queryClient.clear();
-    navigate("/sign-in");
+    navigate("/sign-in", { replace: true });
   };
+
+  if (isLoading) {
+    return null; // or a loader here
+  }
 
   return (
     <AuthContext.Provider

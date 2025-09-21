@@ -53,8 +53,6 @@ const SignIn = () => {
         login(data);
         form.reset();
         toast.success("Logged In Successfully");
-        // navigate("/dashboard");
-        window.location.href = "/dashboard";
       },
 
       onError: (error) => {
