@@ -55,6 +55,7 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setIsAuthenticated(false);
     queryClient.clear();
+    navigate("/sign-in");
   };
 
   return (
