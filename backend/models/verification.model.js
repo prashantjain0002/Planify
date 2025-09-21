@@ -21,6 +21,6 @@ const verificationSchema = new mongoose.Schema(
   }
 );
 
-const verification = mongoose.model("Verification", verificationSchema);
+const Verification = mongoose.model("Verification", verificationSchema);
 
-export default verification;
+export default Verification;
