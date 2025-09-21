@@ -75,6 +75,83 @@ export const registerUser = async (req, res) => {
 
 export const loginUser = async (req, res) => {
   try {
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email }).select("+password");
+    if (!user) {
+      return res.status(404).json({ message: "Invalid email or password" });
+    }
+    if (!user.isEmailVerified) {
+      const exisitingVerification = await Verification.findOne({
+        userId: user._id,
+      });
+      if (
+        exisitingVerification &&
+        exisitingVerification.expiresAt > Date.now()
+      ) {
+        return res.status(400).json({
+          message: "Email is not verified. Please verify your email address.",
+        });
+      } else {
+        await Verification.findByIdAndDelete(exisitingVerification._id);
+
+        const verificationToken = jwt.sign(
+          { userId: user._id, purpose: "email-verification" },
+          process.env.JWT_SECRET,
+          { expiresIn: "1h" }
+        );
+
+        await Verification.create({
+          userId: user._id,
+          token: verificationToken,
+          expiresAt: new Date(Date.now() + 1 * 60 * 60 * 1000),
+        });
+
+        //send Email
+        const verificationLink = `${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
+
+        const emailResult = await sendEmail(
+          newUser.email,
+          "Verify your email address",
+          "views/verifyEmail.ejs",
+          { name: newUser.name, verificationLink }
+        );
+
+        if (!emailResult.success) {
+          return res.status(201).json({
+            message:
+              "User registered successfully, but failed to send verification email.",
+            emailError: emailResult.error,
+          });
+        }
+
+        res.status(201).json({
+          message:
+            "Verification email sent to your email. Please check and verify your account.",
+        });
+      }
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(404).json({ message: "Invalid password" });
+    }
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    user.lastLogin = new Date();
+    await user.save();
+
+    const userData = user.toObject();
+    delete userData.password;
+
+    res.status(200).json({
+      message: "Login successful",
+      token,
+      user: userData,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Internal Server Error" });
