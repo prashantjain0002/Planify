@@ -9,4 +9,8 @@ export default [
     route("reset-password", "routes/auth/ResetPassword.jsx"),
     route("verify-email", "routes/auth/VerifyEmail.jsx"),
   ]),
+
+  layout("routes/dashboard/DashboardLayout.jsx", [
+    route("dashboard", "routes/dashboard/Dashboard.jsx"),
+  ]),
 ];

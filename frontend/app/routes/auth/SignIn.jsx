@@ -20,7 +20,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { useLoginMutation } from "@/hooks/useAuth";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
+import { useAuth } from "@/lib/provider/authContext";
 
 export function meta({}) {
   return [
@@ -38,8 +42,28 @@ const SignIn = () => {
     },
   });
 
+  const { mutate, isPending } = useLoginMutation();
+  const { login } = useAuth();
+
+  const navigate = useNavigate();
+
   const handleOnSubmit = (values) => {
-    console.log(values);
+    mutate(values, {
+      onSuccess: (data) => {
+        login(data);
+        form.reset();
+        toast.success("Logged In Successfully");
+        // navigate("/dashboard");
+        window.location.href = "/dashboard";
+      },
+
+      onError: (error) => {
+        const errorMessage =
+          error?.response?.data?.message || "something went wrong";
+        console.log(error);
+        toast.error(errorMessage);
+      },
+    });
   };
 
   return (
@@ -83,7 +107,10 @@ const SignIn = () => {
                   <FormItem>
                     <div className="flex justify-between items-center">
                       <FormLabel>Password</FormLabel>
-                      <Link to='/forgot-password' className=" text-blue-500 font-semibold hover:underline hover:text-blue-600 text-sm">
+                      <Link
+                        to="/forgot-password"
+                        className=" text-blue-500 font-semibold hover:underline hover:text-blue-600 text-sm"
+                      >
                         Forgot Password?
                       </Link>
                     </div>
@@ -99,8 +126,8 @@ const SignIn = () => {
                 )}
               />
 
-              <Button type="submit" className="w-full">
-                Sign In
+              <Button type="submit" className="w-full" disabled={isPending}>
+                {isPending ? <Loader2 className="w-4 h-4 mr-2" /> : "Log In"}
               </Button>
             </form>
           </Form>

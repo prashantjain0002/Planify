@@ -1,4 +1,7 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { queryClient } from "./reactQueryProvider";
+import { useLocation, useNavigate } from "react-router-dom";
+import { publicRoutes } from "..";
 
 const AuthContext = createContext(undefined);
 
@@ -7,12 +10,51 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const login = async (email, password) => {
-    console.log(email, password);
+  const navigate = useNavigate();
+  const currentPath = useLocation().pathname;
+  const isPublicRoute = publicRoutes.includes(currentPath);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      setIsLoading(true);
+      const userInfo = localStorage.getItem("user");
+      if (userInfo) {
+        setUser(JSON.parse(userInfo));
+        setIsAuthenticated(true);
+      } else {
+        setIsAuthenticated(false);
+        if (!isPublicRoute) {
+          navigate("/sign-in");
+        }
+      }
+      setIsLoading(false);
+    };
+
+    checkAuth();
+  }, []);
+
+  useEffect(() => {
+    const handleLogout = () => {
+      logout();
+      navigate("/sign-in");
+    };
+    window.addEventListener("force-logout", handleLogout);
+    return () => window.removeEventListener("force-logout", handleLogout);
+  }, []);
+
+  const login = async (data) => {
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("user", JSON.stringify(data.user));
+    setUser(data.user);
+    setIsAuthenticated(true);
   };
 
   const logout = async () => {
-    console.log("Log Out");
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setUser(null);
+    setIsAuthenticated(false);
+    queryClient.clear();
   };
 
   return (

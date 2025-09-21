@@ -12,3 +12,9 @@ export const useVerifyEmailMutation = () => {
     mutationFn: (data) => postData("/auth/verify-email", data),
   });
 };
+
+export const useLoginMutation = () => {
+  return useMutation({
+    mutationFn: (data) => postData("/auth/login", data),
+  });
+};
