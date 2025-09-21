@@ -86,12 +86,15 @@ export const verifyEmail = async (req, res) => {
     const { token } = req.body;
 
     const payload = jwt.verify(token, process.env.JWT_SECRET);
+
+    console.log(payload);
+
     if (!payload) {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const { userId, property } = payload;
-    if (property !== "email-verification") {
+    const { userId, purpose } = payload;
+    if (purpose !== "email-verification") {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
