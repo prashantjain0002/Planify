@@ -1,7 +1,6 @@
 import User from "./../models/user.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import verification from "../models/verification.model.js";
 import { sendEmail } from "../libs/sendEmail.js";
 import aj from "../libs/arcjet.js";
 import Verification from "../models/verification.model.js";
@@ -39,7 +38,7 @@ export const registerUser = async (req, res) => {
       { expiresIn: "1h" }
     );
 
-    await verification.create({
+    await Verification.create({
       userId: newUser._id,
       token: verificationToken,
       expiresAt: new Date(Date.now() + 1 * 60 * 60 * 1000),
@@ -255,7 +254,9 @@ export const resetPasswordRequest = async (req, res) => {
       { name: user.name, resetPasswordLink }
     );
 
-    if (!emailResult) {
+    console.log(emailResult);
+
+    if (!emailResult.success) {
       return res.status(500).json({
         message: "Failed to send reset password email. Please try again later.",
       });
@@ -286,12 +287,12 @@ export const verifyResetPasswordTokenAndResetPassword = async (req, res) => {
 
     const verifiaction = await Verification.findOne({ userId, token });
     if (!verifiaction) {
-      return res.status(401).json({ message: "Unauthorized" });
+      return res.status(401).json({ message: "Verification token not found" });
     }
 
     const isTokenExpired = verifiaction.expiresAt < new Date();
-    if (!isTokenExpired) {
-      return res.status(401).json({ message: "Unauthorized" });
+    if (isTokenExpired) {
+      return res.status(401).json({ message: "Verification token expired" });
     }
 
     const user = await User.findById(userId);

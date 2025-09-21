@@ -44,11 +44,12 @@ const VerifyEmail = () => {
 
   return (
     <div className="flex flex-col items-center justify-center h-screen">
-      <h1 className="text-2xl font-bold">Verify Email</h1>
+     
       {/* <p className="text-sm text-gray-500">Verifying your email...</p> */}
 
       <Card className={"w-full max-w-md"}>
         <CardHeader>
+          <h1 className="text-2xl font-bold text-center">Verify Email</h1>
           {/* <Link to={"/sign-in"} className="flex items-center gap-3 text-sm">
             <ArrowLeft className="w-4 h-4" />
             Back to Sign In
