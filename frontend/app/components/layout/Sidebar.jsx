@@ -65,7 +65,7 @@ const Sidebar = ({ currentWorkspace }) => {
           {!isCollapsed && (
             <div className="flex items-center gap-2">
               <Wrench className="size-6 text-blue-500" />
-              <span className="font-semibold text-lg hidden md:block">
+              <span className="font-semibold text-lg hidden md:block text-blue-500">
                 Planify
               </span>
             </div>
@@ -96,14 +96,13 @@ const Sidebar = ({ currentWorkspace }) => {
           className={isCollapsed && "items-center space-y-2"}
         />
       </ScrollArea>
-      <div>
+      <div className="mx-3 mb-2">
         <Button
-          variant={"ghost"}
           size={isCollapsed ? "icon" : "default"}
           onClick={logout}
+          className={"w-full bg-red-500 hover:bg-red-600"}
         >
-          <LogOut className={cn("size-4", isCollapsed && "mr-2")} />
-          <span className="hidden md:block">Logout</span>
+          <LogOut className={cn("size-4", isCollapsed && "mr-2")} /> Logout
         </Button>
       </div>
     </div>
