@@ -1,6 +1,8 @@
+import Header from "@/components/layout/Header";
+import Sidebar from "@/components/layout/Sidebar";
 import Loader from "@/components/Loader";
 import { useAuth } from "@/lib/provider/authContext";
-import React from "react";
+import React, { useState } from "react";
 import { Navigate, Outlet } from "react-router";
 
 export function meta({}) {
@@ -11,7 +13,13 @@ export function meta({}) {
 }
 
 const DashBoardLayout = () => {
+  const [isCreatingWorkspace, setIsCreatingWorkspace] = useState(false);
+  const [currentWorkspace, setCurrentWorkspace] = useState(null);
   const { isAuthenticated, isLoading } = useAuth();
+
+  const handleWorkspaceSelected = (workspace) => {
+    setCurrentWorkspace(workspace);
+  };
 
   if (isLoading) {
     return <Loader />;
@@ -22,9 +30,13 @@ const DashBoardLayout = () => {
   }
   return (
     <div className="flex h-screen w-full">
-      {/* Sidebar Component  */}
+      <Sidebar currentWorkspace={currentWorkspace} />
       <div className="flex flex-1 flex-col h-full">
-        {/* Header  */}
+        <Header
+          onWorkspaceSelected={handleWorkspaceSelected}
+          selectedWorkspace={currentWorkspace}
+          onCreateWorkspace={() => setIsCreatingWorkspace(true)}
+        />
         <main className="flex-1 overflow-y-auto h-full w-full">
           <div className="mx-auto container px-2 sm:px-6 lg:px-8 py-0 md:py-8 w-full h-full">
             <Outlet />
