@@ -74,7 +74,6 @@ const Header = ({
                 <PlusCircle className="w-4 h-4" />
                 <span className="ml-1">Create Workspace</span>
               </DropdownMenuItem>
-              ;
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
