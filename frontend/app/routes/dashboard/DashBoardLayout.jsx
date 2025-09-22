@@ -2,6 +2,7 @@ import Header from "@/components/layout/Header";
 import Sidebar from "@/components/layout/Sidebar";
 import Loader from "@/components/Loader";
 import CreateWorkspace from "@/components/workspace/CreateWorkspace";
+import { getData } from "@/lib/fetchUtil";
 import { useAuth } from "@/lib/provider/authContext";
 import React, { useState } from "react";
 import { Navigate, Outlet } from "react-router";
@@ -12,6 +13,16 @@ export function meta({}) {
     { name: "description", content: "Welcome to Planify" },
   ];
 }
+
+export const clientLoader = async () => {
+  try {
+    const [workspaceData] = await Promise.all([getData("/workspace")]);
+    return { workspaces: workspaceData };
+  } catch (error) {
+    console.log(error);
+    return { workspaces: [] };
+  }
+};
 
 const DashBoardLayout = () => {
   const [isCreatingWorkspace, setIsCreatingWorkspace] = useState(false);
