@@ -23,6 +23,9 @@ import { Input } from "../ui/input";
 import { Loader2 } from "lucide-react";
 import { Textarea } from "../ui/textarea";
 import { cn } from "@/lib/utils";
+import { useCreateWorkspaceMutation } from "@/hooks/useWorkspace";
+import { toast } from "sonner";
+import { useNavigate } from "react-router";
 
 export const colorOptions = [
   "#FF5733",
@@ -45,9 +48,26 @@ const CreateWorkspace = ({ isCreatingWorkspace, setIsCreatingWorkspace }) => {
     },
   });
 
-  const isPending = form.formState.isSubmitting;
+  const { mutate, isPending } = useCreateWorkspaceMutation();
 
-  const onSubmit = (data) => {};
+  const navigate = useNavigate();
+
+  const onSubmit = (data) => {
+    mutate(data, {
+      onSuccess: (data) => {
+        form.reset();
+        setIsCreatingWorkspace(false);
+        toast.success("Workspace created successfully");
+        navigate(`/workspaces/${data._id}`);
+      },
+      onError: (error) => {
+        const errorMessage = error?.response?.data?.message;
+        console.log(error);
+        toast.error(errorMessage);
+      },
+    });
+  };
+
   return (
     <Dialog
       open={isCreatingWorkspace}

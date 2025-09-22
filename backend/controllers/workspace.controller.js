@@ -11,10 +11,7 @@ export const createWorkspace = async (req, res) => {
       members: [{ user: req.user._id, role: "owner", joinedAt: Date.now() }],
     });
 
-    res.status(201).json({
-      workspace,
-      message: "Workspace created successfully",
-    });
+    res.status(201).json(workspace);
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "something went wrong" });
