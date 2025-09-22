@@ -26,3 +26,9 @@ export const resetPasswordSchema = z.object({
     .string()
     .min(8, "Password must be at least 8 characters long"),
 });
+
+export const workspaceSchema = z.object({
+    name: z.string().min(3, "Name must be at least 3 characters long"),
+    description: z.string().optional(),
+    color: z.string().min(3, "color must be at least 3 characters long"),
+})
