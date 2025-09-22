@@ -1,14 +1,23 @@
 import React from "react";
+import { cn } from "@/lib/utils";
 
-const WorkspaceAvatar = ({ color, name }) => {
+const WorkspaceAvatar = ({ color, name, className }) => {
+  let textSize = "text-xs";
+  if (className?.includes("w-12") || className?.includes("h-12")) {
+    textSize = "text-2xl";
+  } else if (className?.includes("w-16") || className?.includes("h-16")) {
+    textSize = "text-4xl";
+  }
+
   return (
     <div
-      className="w-6 h-6 rounded flex items-center justify-center"
+      className={cn(
+        "rounded-md flex items-center justify-center font-medium text-white",
+        className
+      )}
       style={{ backgroundColor: color }}
     >
-      <p className="text-xs font-medium text-white">
-        {name.charAt(0).toUpperCase()}
-      </p>
+      <span className={textSize}>{name?.charAt(0).toUpperCase()}</span>
     </div>
   );
 };
