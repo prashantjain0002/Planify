@@ -28,7 +28,32 @@ export const resetPasswordSchema = z.object({
 });
 
 export const workspaceSchema = z.object({
-    name: z.string().min(3, "Name must be at least 3 characters long"),
-    description: z.string().optional(),
-    color: z.string().min(3, "color must be at least 3 characters long"),
-})
+  name: z.string().min(3, "Name must be at least 3 characters long"),
+  description: z.string().optional(),
+  color: z.string().min(3, "color must be at least 3 characters long"),
+});
+
+export const parmsSchema = z.object({ workspaceId: z.string() });
+
+export const projectSchema = z.object({
+  title: z.string().min(3, "Name must be at least 3 characters long"),
+  description: z.string().optional(),
+  status: z.enum([
+    "Planning",
+    "In Progress",
+    "On Hold",
+    "Completed",
+    "Cancelled",
+  ]),
+  startDate: z.string(),
+  dueDate: z.string().optional(),
+  tags: z.string().optional(),
+  members: z
+    .array(
+      z.object({
+        user: z.string(),
+        role: z.enum(["manager", "contributor", "viewer"]),
+      })
+    )
+    .optional(),
+});

@@ -25,7 +25,7 @@ const WorkspaceDetails = () => {
     );
   }
 
-  console.log(workspace.workspace);
+  // console.log(workspace.workspace);
 
   return (
     <div>

@@ -53,7 +53,8 @@ const projectSchema = new Schema(
       },
     ],
     tags: {
-      type: String,
+      type: [String],
+      default: [],
     },
     createdBy: {
       type: Schema.Types.ObjectId,
