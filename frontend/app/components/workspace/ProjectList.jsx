@@ -7,7 +7,7 @@ const ProjectList = ({ workspaceId, projects, onCreateProject }) => {
     <div>
       <h3 className="text-xl font-medium mb-4">Projects</h3>
 
-      <div className="grid grid-6 sm:grid-cols-2 md:grid-cols-3">
+      <div className="grid grid-6 sm:grid-cols-2 md:grid-cols-3 gap-5">
         {projects.length === 0 ? (
           <NoDataFound
             title={"No project found"}
