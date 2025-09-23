@@ -7,9 +7,16 @@ export const useCreateWorkspaceMutation = () => {
   });
 };
 
-export const useGetWorkspaceQuery = () => {
+export const useGetWorkspacesQuery = () => {
   return useQuery({
     queryKey: ["workspaces"],
     queryFn: async () => await getData("/workspace"),
+  });
+};
+
+export const useGetWorkspaceQuery = (workspaceId) => {
+  return useQuery({
+    queryKey: ["workspace", workspaceId],
+    queryFn: async () => await getData(`/workspace/${workspaceId}/projects`),
   });
 };

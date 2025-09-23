@@ -13,5 +13,9 @@ export default [
   layout("routes/dashboard/DashboardLayout.jsx", [
     route("dashboard", "routes/dashboard/Dashboard.jsx"),
     route("workspaces", "routes/dashboard/workspaces/Workspaces.jsx"),
+    route(
+      "workspaces/:workspaceId",
+      "routes/dashboard/workspaces/WorkspaceDetails.jsx"
+    ),
   ]),
 ];

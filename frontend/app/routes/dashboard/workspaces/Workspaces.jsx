@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import CreateWorkspace from "@/components/workspace/CreateWorkspace";
 import WorkspaceAvatar from "@/components/workspace/WorkspaceAvatar";
-import { useGetWorkspaceQuery } from "@/hooks/useWorkspace";
+import { useGetWorkspacesQuery } from "@/hooks/useWorkspace";
 import { PlusCircle, Users } from "lucide-react";
 import React, { useState } from "react";
 import { Link } from "react-router";
@@ -18,7 +18,7 @@ import { truncateDescription } from "@/lib/utils";
 
 const Workspaces = () => {
   const [isCreatingWorkspace, setIsCreatingWorkspace] = useState(false);
-  const { data: workspaces, isLoading } = useGetWorkspaceQuery();
+  const { data: workspaces, isLoading } = useGetWorkspacesQuery();
 
   if (isLoading) return <Loader />;
 
