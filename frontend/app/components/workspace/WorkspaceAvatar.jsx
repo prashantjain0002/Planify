@@ -12,7 +12,7 @@ const WorkspaceAvatar = ({ color, name, className }) => {
   return (
     <div
       className={cn(
-        "rounded-md flex items-center justify-center font-medium text-white",
+        "rounded flex items-center justify-center font-medium text-white px-2 py-1",
         className
       )}
       style={{ backgroundColor: color }}

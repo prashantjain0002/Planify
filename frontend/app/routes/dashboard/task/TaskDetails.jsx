@@ -1,3 +1,5 @@
+import React from "react";
+import { motion } from "framer-motion";
 import Loader from "@/components/Loader";
 import SubTaskDetails from "@/components/task/SubTaskDetails";
 import TaskActivity from "@/components/task/TaskActivity";
@@ -13,40 +15,53 @@ import { useTaskByIdQuery } from "@/hooks/useTask";
 import { useAuth } from "@/lib/provider/authContext";
 import { formatDistanceToNow } from "date-fns";
 import { Eye, EyeOff } from "lucide-react";
-import React from "react";
 import { useNavigate, useParams } from "react-router";
+
+const containerVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { staggerChildren: 0.15, when: "beforeChildren" },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+};
 
 const TaskDetails = () => {
   const { user } = useAuth();
   const { taskId, projectId, workspaceId } = useParams();
-
   const navigate = useNavigate();
-
   const { data, isLoading } = useTaskByIdQuery(taskId);
 
-  if (isLoading) {
-    return <Loader />;
-  }
-
-  if (!data) {
+  if (isLoading) return <Loader />;
+  if (!data)
     return (
       <div className="flex items-center justify-center h-screen">
         <h1 className="text-2xl font-bold">Task not found</h1>
       </div>
     );
-  }
 
   const { task, project } = data;
-
-  const isUserWatching = task?.watcher?.some(
-    (watcher) => watcher._id.toString() === user._id.toString()
+  const isUserWatching = task?.watchers?.some(
+    (w) => w._id.toString() === user._id.toString()
   );
 
-  const members = task?.assignees || [];
-
   return (
-    <div className="container mx-auto p-0 py-4 md:px-4">
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
+    <motion.div
+      className="container mx-auto p-0 py-4 md:px-4"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      {/* Header */}
+      <motion.div
+        variants={itemVariants}
+        className="flex flex-col md:flex-row md:items-center justify-between mb-6"
+      >
         <div className="flex flex-col md:flex-row md:items-center items-center">
           <Button
             onClick={() => navigate(-1)}
@@ -69,8 +84,6 @@ const TaskDetails = () => {
           <Button
             variant={isUserWatching ? "destructive" : "outline"}
             size={"sm"}
-            onClick={() => {}}
-            className={"w-fit"}
           >
             {isUserWatching ? (
               <>
@@ -83,20 +96,23 @@ const TaskDetails = () => {
             )}
           </Button>
 
-          <Button
-            variant={"outline"}
-            size={"sm"}
-            onClick={() => {}}
-            className={"w-fit"}
-          >
+          <Button variant={"outline"} size={"sm"}>
             {task?.isArchived ? "Unarchive" : "Archive"}
           </Button>
         </div>
-      </div>
+      </motion.div>
 
-      <div className="flex flex-col lg:flex-row gap-4">
-        <div className="lg:col-span-2">
-          <div className="bg-card rounded-lg p-6 shadow-sm mb-6">
+      {/* Main Content */}
+      <motion.div
+        variants={itemVariants}
+        className="flex flex-col lg:flex-row gap-4"
+      >
+        {/* Left Panel */}
+        <motion.div variants={itemVariants} className="lg:col-span-2 w-[70%]">
+          <motion.div
+            variants={itemVariants}
+            className="bg-card rounded-lg p-6 shadow-sm mb-6"
+          >
             <div className="flex flex-col md:flex-row md:items-center justify-between items-start mb-4">
               <div>
                 <Badge
@@ -118,7 +134,7 @@ const TaskDetails = () => {
                   Created at{" "}
                   {formatDistanceToNow(new Date(task.createdAt), {
                     addSuffix: true,
-                  })}{" "}
+                  })}
                 </div>
               </div>
 
@@ -127,7 +143,6 @@ const TaskDetails = () => {
                 <Button
                   className={"hidden md:block"}
                   size={"sm"}
-                  onClick={() => {}}
                   variant={"destructive"}
                 >
                   Delete Task
@@ -137,7 +152,6 @@ const TaskDetails = () => {
 
             <div className="mb-6">
               <h3 className="text-sm font-bold mb-2">Description</h3>
-
               <div className="p-3 rounded-lg border bg-blue-200/30">
                 <TaskDescription
                   description={task.description || ""}
@@ -151,19 +165,18 @@ const TaskDetails = () => {
               assignees={task.assignees}
               projectMembers={project.members}
             />
-
             <TaskPrioritySelector priority={task.priority} taskId={task._id} />
-
             <SubTaskDetails subTasks={task?.subtasks || []} taskId={task._id} />
-          </div>
-        </div>
-        <div className="w-[30%]">
-          <Watchers watchers={task?.watchers || []} />
+          </motion.div>
+        </motion.div>
 
+        {/* Right Panel */}
+        <motion.div variants={itemVariants} className="w-[30%] space-y-4">
+          <Watchers watchers={task?.watchers || []} />
           <TaskActivity resourceId={task._id} />
-        </div>
-      </div>
-    </div>
+        </motion.div>
+      </motion.div>
+    </motion.div>
   );
 };
 
