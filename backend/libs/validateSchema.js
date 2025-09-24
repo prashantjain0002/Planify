@@ -1,5 +1,11 @@
 import { z } from "zod";
 
+export const parmsWorkspaceIdSchema = z.object({ workspaceId: z.string() });
+export const parmsProjectIdSchema = z.object({ projectId: z.string() });
+export const parmsTaskIdSchema = z.object({ taskId: z.string() });
+
+export const titleSchema = z.object({ title: z.string() });
+
 export const registerSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters long"),
   email: z.string().email("Invalid email address"),
@@ -32,10 +38,6 @@ export const workspaceSchema = z.object({
   description: z.string().optional(),
   color: z.string().min(3, "color must be at least 3 characters long"),
 });
-
-export const parmsWorkspaceIdSchema = z.object({ workspaceId: z.string() });
-export const parmsProjectIdSchema = z.object({ projectId: z.string() });
-export const parmsTaskIdSchema = z.object({ taskId: z.string() });
 
 export const projectSchema = z.object({
   title: z.string().min(3, "Name must be at least 3 characters long"),
