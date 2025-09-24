@@ -33,7 +33,8 @@ export const workspaceSchema = z.object({
   color: z.string().min(3, "color must be at least 3 characters long"),
 });
 
-export const parmsSchema = z.object({ workspaceId: z.string() });
+export const parmsWorkspaceIdSchema = z.object({ workspaceId: z.string() });
+export const parmsProjectIdSchema = z.object({ projectId: z.string() });
 
 export const projectSchema = z.object({
   title: z.string().min(3, "Name must be at least 3 characters long"),
@@ -56,4 +57,13 @@ export const projectSchema = z.object({
       })
     )
     .optional(),
+});
+
+export const taskSchema = z.object({
+  title: z.string().min(3, "Name must be at least 3 characters long"),
+  description: z.string().optional(),
+  status: z.enum(["To Do", "In Progress", "Done"]),
+  priority: z.enum(["Low", "Medium", "High"]),
+  dueDate: z.string().optional(),
+  assignees: z.array(z.string()).min(1, "At least one Assignee is required"),
 });

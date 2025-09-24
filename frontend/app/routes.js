@@ -17,5 +17,9 @@ export default [
       "workspaces/:workspaceId",
       "routes/dashboard/workspaces/WorkspaceDetails.jsx"
     ),
+    route(
+      "workspace/:workspaceId/projects/:projectId",
+      "routes/dashboard/project/ProjectDetails.jsx"
+    ),
   ]),
 ];
