@@ -1,4 +1,5 @@
 import Loader from "@/components/Loader";
+import TaskDescription from "@/components/task/TaskDescription";
 import TaskStatusSelector from "@/components/task/TaskStatusSelector";
 import TaskTitle from "@/components/task/TaskTitle";
 import { Badge } from "@/components/ui/badge";
@@ -127,6 +128,17 @@ const TaskDetails = () => {
                   Delete Task
                 </Button>
               </div>
+            </div>
+
+            <div className="mb-6 flex flex-row gap-1">
+              <h3 className="text-sm font-bold mb-0">
+                Description : 
+              </h3>
+
+              <TaskDescription
+                description={task.description || ""}
+                taskId={task._id}
+              />
             </div>
           </div>
         </div>

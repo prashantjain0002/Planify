@@ -37,11 +37,25 @@ export const useUpdateTaskTitleMutatuion = () => {
   });
 };
 
+export const useUpdateTaskDescriptionMutatuion = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data) =>
+      updateData(`/tasks/${data.taskId}/description`, {
+        description: data.description,
+      }),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: ["task", data._id],
+      });
+    },
+  });
+};
+
 export const useUpdateTaskStatusMutatuion = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data) =>
-      
       updateData(`/tasks/${data.taskId}/status`, { status: data.status }),
     onSuccess: (data) => {
       queryClient.invalidateQueries({
