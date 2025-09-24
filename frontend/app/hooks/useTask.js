@@ -64,3 +64,16 @@ export const useUpdateTaskStatusMutatuion = () => {
     },
   });
 };
+
+export const useUpdateTaskAssigneesMutatuion = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data) =>
+      updateData(`/tasks/${data.taskId}/assignees`, { assignees: data.assignees }),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: ["task", data._id],
+      });
+    },
+  });
+};

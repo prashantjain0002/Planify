@@ -2,6 +2,7 @@ import express from "express";
 import { validateRequest } from "zod-express-middleware";
 import authMiddleware from "../middleware/auth.middleware.js";
 import {
+  assigneesSchema,
   descriptionSchema,
   parmsProjectIdSchema,
   parmsTaskIdSchema,
@@ -12,6 +13,7 @@ import {
 import {
   createTask,
   getTaskById,
+  updateTaskAssignees,
   updateTaskDescription,
   updateTaskStatus,
   updateTaskTitle,
@@ -57,6 +59,16 @@ router.put(
     body: statusSchema,
   }),
   updateTaskStatus
+);
+
+router.put(
+  "/:taskId/assignees",
+  authMiddleware,
+  validateRequest({
+    params: parmsTaskIdSchema,
+    body: assigneesSchema,
+  }),
+  updateTaskAssignees
 );
 
 router.get(
