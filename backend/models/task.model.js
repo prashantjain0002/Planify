@@ -34,10 +34,12 @@ const taskSchema = new Schema(
         ref: "User",
       },
     ],
-    watchers: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-    },
+    watchers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
     dueDate: {
       type: Date,
     },

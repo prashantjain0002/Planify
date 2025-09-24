@@ -35,6 +35,7 @@ export const workspaceSchema = z.object({
 
 export const parmsWorkspaceIdSchema = z.object({ workspaceId: z.string() });
 export const parmsProjectIdSchema = z.object({ projectId: z.string() });
+export const parmsTaskIdSchema = z.object({ taskId: z.string() });
 
 export const projectSchema = z.object({
   title: z.string().min(3, "Name must be at least 3 characters long"),
