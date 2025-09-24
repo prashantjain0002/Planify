@@ -3,6 +3,10 @@ import { z } from "zod";
 export const parmsWorkspaceIdSchema = z.object({ workspaceId: z.string() });
 export const parmsProjectIdSchema = z.object({ projectId: z.string() });
 export const parmsTaskIdSchema = z.object({ taskId: z.string() });
+export const parmsSubTaskIdSchema = z.object({
+  taskId: z.string(),
+  subTaskId: z.string(),
+});
 
 export const titleSchema = z.object({ title: z.string() });
 export const descriptionSchema = z.object({ description: z.string() });
@@ -12,6 +16,9 @@ export const assigneesSchema = z.object({
 });
 export const prioritySchema = z.object({
   priority: z.enum(["Low", "Medium", "High"]),
+});
+export const subTaskUpdateSchema = z.object({
+  completed: z.boolean(),
 });
 
 export const registerSchema = z.object({
@@ -77,4 +84,8 @@ export const taskSchema = z.object({
   priority: z.enum(["Low", "Medium", "High"]),
   dueDate: z.string().optional(),
   assignees: z.array(z.string()).min(1, "At least one Assignee is required"),
+});
+
+export const subTaskSchema = z.object({
+  title: z.string().min(3, "Name must be at least 3 characters long"),
 });

@@ -5,15 +5,20 @@ import {
   assigneesSchema,
   descriptionSchema,
   parmsProjectIdSchema,
+  parmsSubTaskIdSchema,
   parmsTaskIdSchema,
   prioritySchema,
   statusSchema,
+  subTaskSchema,
+  subTaskUpdateSchema,
   taskSchema,
   titleSchema,
 } from "../libs/validateSchema.js";
 import {
+  addSubTask,
   createTask,
   getTaskById,
+  updateSubTask,
   updateTaskAssignees,
   updateTaskDescription,
   updateTaskPriority,
@@ -31,6 +36,16 @@ router.post(
     body: taskSchema,
   }),
   createTask
+);
+
+router.post(
+  "/:taskId/add-subtask",
+  authMiddleware,
+  validateRequest({
+    params: parmsTaskIdSchema,
+    body: subTaskSchema,
+  }),
+  addSubTask
 );
 
 router.put(
@@ -81,6 +96,16 @@ router.put(
     body: prioritySchema,
   }),
   updateTaskPriority
+);
+
+router.put(
+  "/:taskId/subtask/:subTaskId",
+  authMiddleware,
+  validateRequest({
+    params: parmsSubTaskIdSchema,
+    body: subTaskUpdateSchema,
+  }),
+  updateSubTask
 );
 
 router.get(

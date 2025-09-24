@@ -1,4 +1,5 @@
 import Loader from "@/components/Loader";
+import SubTaskDetails from "@/components/task/SubTaskDetails";
 import TaskAssigneesSelector from "@/components/task/TaskAssigneesSelector";
 import TaskDescription from "@/components/task/TaskDescription";
 import TaskPrioritySelector from "@/components/task/TaskPrioritySelector";
@@ -147,10 +148,9 @@ const TaskDetails = () => {
               projectMembers={project.members}
             />
 
-            <TaskPrioritySelector
-              priority={task.priority}
-              taskId={task._id}
-            />
+            <TaskPrioritySelector priority={task.priority} taskId={task._id} />
+            {console.log(task.subtasks)}
+            <SubTaskDetails subTasks={task?.subtasks || []} taskId={task._id} />
           </div>
         </div>
       </div>
