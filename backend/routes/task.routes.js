@@ -6,6 +6,7 @@ import {
   descriptionSchema,
   parmsProjectIdSchema,
   parmsTaskIdSchema,
+  prioritySchema,
   statusSchema,
   taskSchema,
   titleSchema,
@@ -15,6 +16,7 @@ import {
   getTaskById,
   updateTaskAssignees,
   updateTaskDescription,
+  updateTaskPriority,
   updateTaskStatus,
   updateTaskTitle,
 } from "../controllers/task.controller.js";
@@ -69,6 +71,16 @@ router.put(
     body: assigneesSchema,
   }),
   updateTaskAssignees
+);
+
+router.put(
+  "/:taskId/priority",
+  authMiddleware,
+  validateRequest({
+    params: parmsTaskIdSchema,
+    body: prioritySchema,
+  }),
+  updateTaskPriority
 );
 
 router.get(

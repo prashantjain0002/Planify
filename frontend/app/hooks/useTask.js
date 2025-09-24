@@ -77,3 +77,16 @@ export const useUpdateTaskAssigneesMutatuion = () => {
     },
   });
 };
+
+export const useUpdateTaskPriorityMutatuion = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data) =>
+      updateData(`/tasks/${data.taskId}/priority`, { priority: data.priority }),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: ["task", data._id],
+      });
+    },
+  });
+};

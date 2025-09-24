@@ -1,6 +1,7 @@
 import Loader from "@/components/Loader";
 import TaskAssigneesSelector from "@/components/task/TaskAssigneesSelector";
 import TaskDescription from "@/components/task/TaskDescription";
+import TaskPrioritySelector from "@/components/task/TaskPrioritySelector";
 import TaskStatusSelector from "@/components/task/TaskStatusSelector";
 import TaskTitle from "@/components/task/TaskTitle";
 import { Badge } from "@/components/ui/badge";
@@ -144,6 +145,11 @@ const TaskDetails = () => {
               task={task}
               assignees={task.assignees}
               projectMembers={project.members}
+            />
+
+            <TaskPrioritySelector
+              priority={task.priority}
+              taskId={task._id}
             />
           </div>
         </div>

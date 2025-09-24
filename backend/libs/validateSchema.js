@@ -10,6 +10,9 @@ export const statusSchema = z.object({ status: z.string() });
 export const assigneesSchema = z.object({
   assignees: z.array(z.string()),
 });
+export const prioritySchema = z.object({
+  priority: z.enum(["Low", "Medium", "High"]),
+});
 
 export const registerSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters long"),
