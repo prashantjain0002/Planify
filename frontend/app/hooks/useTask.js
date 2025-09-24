@@ -36,3 +36,17 @@ export const useUpdateTaskTitleMutatuion = () => {
     },
   });
 };
+
+export const useUpdateTaskStatusMutatuion = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data) =>
+      
+      updateData(`/tasks/${data.taskId}/status`, { status: data.status }),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: ["task", data._id],
+      });
+    },
+  });
+};

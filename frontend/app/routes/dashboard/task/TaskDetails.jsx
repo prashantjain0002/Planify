@@ -1,9 +1,11 @@
 import Loader from "@/components/Loader";
+import TaskStatusSelector from "@/components/task/TaskStatusSelector";
 import TaskTitle from "@/components/task/TaskTitle";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useTaskByIdQuery } from "@/hooks/useTask";
 import { useAuth } from "@/lib/provider/authContext";
+import { formatDistanceToNow } from "date-fns";
 import { Eye, EyeOff } from "lucide-react";
 import React from "react";
 import { useNavigate, useParams } from "react-router";
@@ -105,6 +107,25 @@ const TaskDetails = () => {
                 </Badge>
 
                 <TaskTitle title={task.title} taskId={task._id} />
+
+                <div className="text-sm text-muted-foreground">
+                  Created at{" "}
+                  {formatDistanceToNow(new Date(task.createdAt), {
+                    addSuffix: true,
+                  })}{" "}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 mt-4 md:mt-0">
+                <TaskStatusSelector taskId={task._id} status={task.status} />
+                <Button
+                  className={"hidden md:block"}
+                  size={"sm"}
+                  onClick={() => {}}
+                  variant={"destructive"}
+                >
+                  Delete Task
+                </Button>
               </div>
             </div>
           </div>

@@ -6,6 +6,7 @@ export const parmsTaskIdSchema = z.object({ taskId: z.string() });
 
 export const titleSchema = z.object({ title: z.string() });
 export const descriptionSchema = z.object({ description: z.string() });
+export const statusSchema = z.object({ status: z.string() });
 
 export const registerSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters long"),

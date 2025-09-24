@@ -5,6 +5,7 @@ import {
   descriptionSchema,
   parmsProjectIdSchema,
   parmsTaskIdSchema,
+  statusSchema,
   taskSchema,
   titleSchema,
 } from "../libs/validateSchema.js";
@@ -12,6 +13,7 @@ import {
   createTask,
   getTaskById,
   updateTaskDescription,
+  updateTaskStatus,
   updateTaskTitle,
 } from "../controllers/task.controller.js";
 
@@ -45,6 +47,16 @@ router.put(
     body: descriptionSchema,
   }),
   updateTaskDescription
+);
+
+router.put(
+  "/:taskId/status",
+  authMiddleware,
+  validateRequest({
+    params: parmsTaskIdSchema,
+    body: statusSchema,
+  }),
+  updateTaskStatus
 );
 
 router.get(
