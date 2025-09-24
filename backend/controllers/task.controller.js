@@ -1,4 +1,5 @@
 import { recordActivity } from "../libs/index.js";
+import ActivityLog from "../models/activity.model.js";
 import Project from "../models/project.model.js";
 import Task from "../models/task.model.js";
 import Workspace from "../models/workspace.model.js";
@@ -112,6 +113,24 @@ export const getTaskById = async (req, res) => {
     }
 
     res.status(200).json({ task, project });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getActivityByResourceId = async (req, res) => {
+  try {
+    const { resourceId } = req.params;
+
+    const activity = await ActivityLog.find({ resourseId: resourceId })
+      .populate("user", "name profilePicture")
+      .sort({ createdAt: -1 });
+    if (!activity) {
+      return res.status(404).json({ message: "Activity not found" });
+    }
+
+    res.status(200).json(activity);
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Internal server error" });

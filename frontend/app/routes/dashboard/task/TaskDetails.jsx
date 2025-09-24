@@ -1,10 +1,12 @@
 import Loader from "@/components/Loader";
 import SubTaskDetails from "@/components/task/SubTaskDetails";
+import TaskActivity from "@/components/task/TaskActivity";
 import TaskAssigneesSelector from "@/components/task/TaskAssigneesSelector";
 import TaskDescription from "@/components/task/TaskDescription";
 import TaskPrioritySelector from "@/components/task/TaskPrioritySelector";
 import TaskStatusSelector from "@/components/task/TaskStatusSelector";
 import TaskTitle from "@/components/task/TaskTitle";
+import Watchers from "@/components/task/Watchers";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useTaskByIdQuery } from "@/hooks/useTask";
@@ -92,7 +94,7 @@ const TaskDetails = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="flex flex-col lg:flex-row gap-4">
         <div className="lg:col-span-2">
           <div className="bg-card rounded-lg p-6 shadow-sm mb-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between items-start mb-4">
@@ -133,13 +135,15 @@ const TaskDetails = () => {
               </div>
             </div>
 
-            <div className="mb-6 flex flex-row gap-1">
-              <h3 className="text-sm font-bold mb-0">Description :</h3>
+            <div className="mb-6">
+              <h3 className="text-sm font-bold mb-2">Description</h3>
 
-              <TaskDescription
-                description={task.description || ""}
-                taskId={task._id}
-              />
+              <div className="p-3 rounded-lg border bg-blue-200/30">
+                <TaskDescription
+                  description={task.description || ""}
+                  taskId={task._id}
+                />
+              </div>
             </div>
 
             <TaskAssigneesSelector
@@ -149,9 +153,14 @@ const TaskDetails = () => {
             />
 
             <TaskPrioritySelector priority={task.priority} taskId={task._id} />
-            {console.log(task.subtasks)}
+
             <SubTaskDetails subTasks={task?.subtasks || []} taskId={task._id} />
           </div>
+        </div>
+        <div className="w-[30%]">
+          <Watchers watchers={task?.watchers || []} />
+
+          <TaskActivity resourceId={task._id} />
         </div>
       </div>
     </div>

@@ -5,6 +5,7 @@ import {
   assigneesSchema,
   descriptionSchema,
   parmsProjectIdSchema,
+  parmsResourceIdSchema,
   parmsSubTaskIdSchema,
   parmsTaskIdSchema,
   prioritySchema,
@@ -17,6 +18,7 @@ import {
 import {
   addSubTask,
   createTask,
+  getActivityByResourceId,
   getTaskById,
   updateSubTask,
   updateTaskAssignees,
@@ -115,6 +117,15 @@ router.get(
     params: parmsTaskIdSchema,
   }),
   getTaskById
+);
+
+router.get(
+  "/:resourceId/activity",
+  authMiddleware,
+  validateRequest({
+    params: parmsResourceIdSchema,
+  }),
+  getActivityByResourceId
 );
 
 export default router;

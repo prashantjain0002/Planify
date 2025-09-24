@@ -7,6 +7,7 @@ export const parmsSubTaskIdSchema = z.object({
   taskId: z.string(),
   subTaskId: z.string(),
 });
+export const parmsResourceIdSchema = z.object({ resourceId: z.string() });
 
 export const titleSchema = z.object({ title: z.string() });
 export const descriptionSchema = z.object({ description: z.string() });

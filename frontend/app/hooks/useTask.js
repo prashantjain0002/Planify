@@ -39,14 +39,25 @@ export const useTaskByIdQuery = (taskId) => {
   });
 };
 
+export const useActivityByResourceIdQuery = (resourceId) => {
+  return useQuery({
+    queryKey: ["task-activity", resourceId],
+    queryFn: () => getData(`/tasks/${resourceId}/activity`),
+  });
+};
+
 export const useUpdateTaskTitleMutatuion = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data) =>
       updateData(`/tasks/${data.taskId}/title`, { title: data.title }),
+
     onSuccess: (data) => {
       queryClient.invalidateQueries({
         queryKey: ["task", data._id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["task-activity", data._id],
       });
     },
   });
@@ -63,6 +74,9 @@ export const useUpdateTaskDescriptionMutatuion = () => {
       queryClient.invalidateQueries({
         queryKey: ["task", data._id],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["task-activity", data._id],
+      });
     },
   });
 };
@@ -75,6 +89,9 @@ export const useUpdateTaskStatusMutatuion = () => {
     onSuccess: (data) => {
       queryClient.invalidateQueries({
         queryKey: ["task", data._id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["task-activity", data._id],
       });
     },
   });
@@ -91,6 +108,9 @@ export const useUpdateTaskAssigneesMutatuion = () => {
       queryClient.invalidateQueries({
         queryKey: ["task", data._id],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["task-activity", data._id],
+      });
     },
   });
 };
@@ -103,6 +123,9 @@ export const useUpdateTaskPriorityMutatuion = () => {
     onSuccess: (data) => {
       queryClient.invalidateQueries({
         queryKey: ["task", data._id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["task-activity", data._id],
       });
     },
   });
@@ -118,6 +141,9 @@ export const useUpdateSubTaskMutatuion = () => {
     onSuccess: (data) => {
       queryClient.invalidateQueries({
         queryKey: ["task", data._id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["task-activity", data._id],
       });
     },
   });
