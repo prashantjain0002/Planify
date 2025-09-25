@@ -1,11 +1,13 @@
+import React from "react";
+import { useSearchParams } from "react-router";
+import { motion } from "framer-motion";
+
 import RecentProjects from "@/components/dashboard/RecentProjects";
 import StatisticsCharts from "@/components/dashboard/StatisticsCharts";
 import StatsCard from "@/components/dashboard/StatsCard";
 import UpcomingTasks from "@/components/dashboard/UpcomingTasks";
 import Loader from "@/components/Loader";
 import { useGetWorkspaceStatusQuery } from "@/hooks/useWorkspace";
-import React from "react";
-import { useSearchParams } from "react-router";
 
 const Dashboard = () => {
   const [searchParams] = useSearchParams();
@@ -15,33 +17,69 @@ const Dashboard = () => {
 
   if (isPending) return <Loader />;
 
-  console.log(data);
+  const sectionVariants = {
+    hidden: { opacity: 0, y: 40 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+  };
 
   return (
-    <div className="space-y-8 2xl:space-y-12">
-      <div className="flex items-center justify-between">
+    <motion.div
+      className="space-y-8 2xl:space-y-12 px-6"
+      style={{ scrollbarWidth: "none" }} // Firefox
+    >
+      {/* Dashboard Header */}
+      <motion.div
+        className="flex items-center justify-between"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+        variants={sectionVariants}
+      >
         <h1 className="text-2xl font-bold">Dashboard</h1>
-      </div>
+      </motion.div>
 
-      <StatsCard data={data.stats} />
+      {/* Stats Cards */}
+      <motion.div
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+        variants={sectionVariants}
+      >
+        <StatsCard data={data.stats} />
+      </motion.div>
 
-      <StatisticsCharts
-        stats={data.stats}
-        taskTrendsData={data.taskTrendsData}
-        projectStatusData={data.projectStatusData}
-        taskPriorityData={data.taskPriorityData}
-        workspaceProductivityData={data.workspaceProductivityData}
-      />
+      {/* Statistics Charts */}
+      <motion.div
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+        variants={sectionVariants}
+      >
+        <StatisticsCharts
+          stats={data.stats}
+          taskTrendsData={data.taskTrendsData}
+          projectStatusData={data.projectStatusData}
+          taskPriorityData={data.taskPriorityData}
+          workspaceProductivityData={data.workspaceProductivityData}
+        />
+      </motion.div>
 
-      <div className="flex flex-col lg:flex-row gap-6">
-        <div className="flex-1">
+      {/* Recent Projects & Upcoming Tasks */}
+      <motion.div
+        className="flex flex-col lg:flex-row gap-6"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+        variants={sectionVariants}
+      >
+        <motion.div className="flex-1" variants={sectionVariants}>
           <RecentProjects data={data.recentProjects} />
-        </div>
-        <div className="flex-1">
+        </motion.div>
+        <motion.div className="flex-1" variants={sectionVariants}>
           <UpcomingTasks data={data.upcomingTasks} />
-        </div>
-      </div>
-    </div>
+        </motion.div>
+      </motion.div>
+    </motion.div>
   );
 };
 
