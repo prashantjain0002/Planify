@@ -48,6 +48,34 @@ export const useAddComment = () => {
   });
 };
 
+export const useWatchTask = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data) => {
+      return await postData(`/tasks/${data.taskId}/watch`, {});
+    },
+    onSuccess: (_, { taskId }) => {
+      queryClient.invalidateQueries(["task", taskId]);
+      queryClient.invalidateQueries(["task-activity", taskId]);
+    },
+  });
+};
+
+export const useArchiveTask = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data) => {
+      return await postData(`/tasks/${data.taskId}/archive`, {});
+    },
+    onSuccess: (_, { taskId }) => {
+      queryClient.invalidateQueries(["task", taskId]);
+      queryClient.invalidateQueries(["task-activity", taskId]);
+    },
+  });
+};
+
 export const useTaskByIdQuery = (taskId) => {
   return useQuery({
     queryKey: ["task", taskId],

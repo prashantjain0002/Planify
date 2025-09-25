@@ -11,12 +11,17 @@ import TaskTitle from "@/components/task/TaskTitle";
 import Watchers from "@/components/task/Watchers";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useTaskByIdQuery } from "@/hooks/useTask";
+import {
+  useArchiveTask,
+  useTaskByIdQuery,
+  useWatchTask,
+} from "@/hooks/useTask";
 import { useAuth } from "@/lib/provider/authContext";
 import { formatDistanceToNow } from "date-fns";
 import { Eye, EyeOff } from "lucide-react";
 import { useNavigate, useParams } from "react-router";
 import CommentSection from "@/components/task/CommentSection";
+import { toast } from "sonner";
 
 const containerVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -35,8 +40,12 @@ const itemVariants = {
 const TaskDetails = () => {
   const { user } = useAuth();
   const { taskId, projectId, workspaceId } = useParams();
+
   const navigate = useNavigate();
+
   const { data, isLoading } = useTaskByIdQuery(taskId);
+  const { mutate: watchTask, isPending: isWatching } = useWatchTask();
+  const { mutate: archiveTask, isPending: isArchiving } = useArchiveTask();
 
   if (isLoading) return <Loader />;
   if (!data)
@@ -50,6 +59,34 @@ const TaskDetails = () => {
   const isUserWatching = task?.watchers?.some(
     (w) => w._id.toString() === user._id.toString()
   );
+
+  const handleWatchTask = () => {
+    watchTask(
+      { taskId: task._id },
+      {
+        onSuccess: () => {
+          toast.success("Task Watched");
+        },
+        onError: (error) => {
+          toast.error(error?.message || "Failed to watch task");
+        },
+      }
+    );
+  };
+
+  const handleArchiveTask = () => {
+    archiveTask(
+      { taskId: task._id },
+      {
+        onSuccess: () => {
+          toast.success("Task Archived");
+        },
+        onError: (error) => {
+          toast.error(error?.message || "Failed to archive task");
+        },
+      }
+    );
+  };
 
   return (
     <motion.div
@@ -84,10 +121,12 @@ const TaskDetails = () => {
           <Button
             variant={isUserWatching ? "destructive" : "outline"}
             size={"sm"}
+            onClick={handleWatchTask}
+            disabled={isWatching}
           >
             {isUserWatching ? (
               <>
-                <EyeOff className="size-4" /> UnWatch
+                <EyeOff className="size-4" /> Unwatch
               </>
             ) : (
               <>
@@ -96,7 +135,12 @@ const TaskDetails = () => {
             )}
           </Button>
 
-          <Button variant={"outline"} size={"sm"}>
+          <Button
+            variant={"outline"}
+            size={"sm"}
+            onClick={handleArchiveTask}
+            disabled={isArchiving}
+          >
             {task?.isArchived ? "Unarchive" : "Archive"}
           </Button>
         </div>
@@ -165,9 +209,8 @@ const TaskDetails = () => {
             />
             <TaskPrioritySelector priority={task.priority} taskId={task._id} />
             <SubTaskDetails subTasks={task?.subtasks || []} taskId={task._id} />
-
           </motion.div>
-            <CommentSection taskId={task._id} members={project.members || []} />
+          <CommentSection taskId={task._id} members={project.members || []} />
         </motion.div>
 
         <motion.div variants={itemVariants} className="w-[30%] space-y-4">

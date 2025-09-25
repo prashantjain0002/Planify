@@ -132,7 +132,91 @@ export const addComment = async (req, res) => {
         text.substring(0, 50) + (text.length > 50 ? "..." : "")
       }`,
     });
-    
+
+    res.status(201).json(task);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const watchTask = async (req, res) => {
+  try {
+    const { taskId } = req.params;
+
+    const task = await Task.findById(taskId);
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    const project = await Project.findById(task.project);
+    if (!project) {
+      return res.status(404).json({ message: "Project not found" });
+    }
+
+    const isMember = project.members.some(
+      (member) => member.user.toString() === req.user._id.toString()
+    );
+    if (!isMember) {
+      return res
+        .status(403)
+        .json({ message: "You are not a member of this project" });
+    }
+
+    const isWatching = task.watchers.includes(req.user._id);
+    if (!isWatching) {
+      task.watchers.push(req.user._id);
+    } else {
+      task.watchers = task.watchers.filter(
+        (watcher) => watcher.toString() !== req.user._id.toString()
+      );
+    }
+
+    await task.save();
+
+    await recordActivity(req.user._id, "updated_task", "Task", taskId, {
+      description: `${
+        isWatching ? "Stopped watching" : "Started watching"
+      } task ${task.title}`,
+    });
+
+    res.status(201).json(task);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const archiveTask = async (req, res) => {
+  try {
+    const { taskId } = req.params;
+
+    const task = await Task.findById(taskId);
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    const project = await Project.findById(task.project);
+    if (!project) {
+      return res.status(404).json({ message: "Project not found" });
+    }
+
+    const isMember = project.members.some(
+      (member) => member.user.toString() === req.user._id.toString()
+    );
+    if (!isMember) {
+      return res
+        .status(403)
+        .json({ message: "You are not a member of this project" });
+    }
+
+    const Archived = task.isArchived;
+    task.isArchived = !Archived;
+    await task.save();
+
+    await recordActivity(req.user._id, "updated_task", "Task", taskId, {
+      description: `${Archived ? "Unarchived" : "Archived"} task ${task.title}`,
+    });
 
     res.status(201).json(task);
   } catch (error) {

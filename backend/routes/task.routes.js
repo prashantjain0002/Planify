@@ -19,6 +19,7 @@ import {
 import {
   addComment,
   addSubTask,
+  archiveTask,
   createTask,
   getActivityByResourceId,
   getCommentByTaskId,
@@ -29,6 +30,7 @@ import {
   updateTaskPriority,
   updateTaskStatus,
   updateTaskTitle,
+  watchTask,
 } from "../controllers/task.controller.js";
 
 const router = express.Router();
@@ -61,6 +63,24 @@ router.post(
     body: commentSchema,
   }),
   addComment
+);
+
+router.post(
+  "/:taskId/watch",
+  authMiddleware,
+  validateRequest({
+    params: parmsTaskIdSchema,
+  }),
+  watchTask
+);
+
+router.post(
+  "/:taskId/archive",
+  authMiddleware,
+  validateRequest({
+    params: parmsTaskIdSchema,
+  }),
+  archiveTask
 );
 
 router.put(
