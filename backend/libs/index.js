@@ -15,7 +15,14 @@ export const recordActivity = async (
       resourseId,
       details,
     });
+
+    // Remove activity older than 1 year
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+
+    await ActivityLog.deleteMany({ createdAt: { $lt: oneYearAgo } });
   } catch (error) {
     console.log(error);
   }
 };
+
