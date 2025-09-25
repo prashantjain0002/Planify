@@ -12,7 +12,7 @@ import {
   DropdownMenuGroup,
 } from "../ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { Link, useLoaderData } from "react-router";
+import { Link, useLoaderData, useLocation, useNavigate } from "react-router";
 import WorkspaceAvatar from "../workspace/WorkspaceAvatar";
 
 const Header = ({
@@ -23,6 +23,21 @@ const Header = ({
   const { user, logout } = useAuth();
 
   const { workspaces } = useLoaderData();
+
+  const navigate = useNavigate();
+
+  const isOnWorkspacePage = useLocation().pathname.includes("/workspace");
+
+  const handleOnClick = (workspace) => {
+    onWorkspaceSelected(workspace);
+    const location = window.location;
+    if (isOnWorkspacePage) {
+      navigate(`/workspaces/${workspace._id}`);
+    } else {
+      const basePath = location.pathname;
+      navigate(`${basePath}?workspaceId=${workspace._id}`);
+    }
+  };
 
   return (
     <div className="bg-background sticky top-0 z-40 border-b">
@@ -60,7 +75,7 @@ const Header = ({
                 return (
                   <DropdownMenuItem
                     key={ws.id}
-                    onClick={() => onWorkspaceSelected(ws)}
+                    onClick={() => handleOnClick(ws)}
                   >
                     {ws.color && (
                       <WorkspaceAvatar color={ws.color} name={ws.name} />

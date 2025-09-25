@@ -7,6 +7,7 @@ import {
   getWorkspaceDetails,
   getWorkspaceProjects,
   getWorkspaces,
+  getWorkspaceStats,
 } from "../controllers/workspace.controller.js";
 
 const router = express.Router();
@@ -23,5 +24,7 @@ router.get("/", authMiddleware, getWorkspaces);
 router.get("/:workspaceId", authMiddleware, getWorkspaceDetails);
 
 router.get("/:workspaceId/projects", authMiddleware, getWorkspaceProjects);
+
+router.get("/:workspaceId/stats", authMiddleware, getWorkspaceStats);
 
 export default router;
