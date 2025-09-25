@@ -16,6 +16,7 @@ import { useAuth } from "@/lib/provider/authContext";
 import { formatDistanceToNow } from "date-fns";
 import { Eye, EyeOff } from "lucide-react";
 import { useNavigate, useParams } from "react-router";
+import CommentSection from "@/components/task/CommentSection";
 
 const containerVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -57,7 +58,6 @@ const TaskDetails = () => {
       initial="hidden"
       animate="visible"
     >
-      {/* Header */}
       <motion.div
         variants={itemVariants}
         className="flex flex-col md:flex-row md:items-center justify-between mb-6"
@@ -102,12 +102,10 @@ const TaskDetails = () => {
         </div>
       </motion.div>
 
-      {/* Main Content */}
       <motion.div
         variants={itemVariants}
         className="flex flex-col lg:flex-row gap-4"
       >
-        {/* Left Panel */}
         <motion.div variants={itemVariants} className="lg:col-span-2 w-[70%]">
           <motion.div
             variants={itemVariants}
@@ -167,10 +165,11 @@ const TaskDetails = () => {
             />
             <TaskPrioritySelector priority={task.priority} taskId={task._id} />
             <SubTaskDetails subTasks={task?.subtasks || []} taskId={task._id} />
+
           </motion.div>
+            <CommentSection taskId={task._id} members={project.members || []} />
         </motion.div>
 
-        {/* Right Panel */}
         <motion.div variants={itemVariants} className="w-[30%] space-y-4">
           <Watchers watchers={task?.watchers || []} />
           <TaskActivity resourceId={task._id} />

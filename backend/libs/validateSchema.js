@@ -90,3 +90,7 @@ export const taskSchema = z.object({
 export const subTaskSchema = z.object({
   title: z.string().min(3, "Name must be at least 3 characters long"),
 });
+
+export const commentSchema = z.object({
+  text: z.string(),
+});

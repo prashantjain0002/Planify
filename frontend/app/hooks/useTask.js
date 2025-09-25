@@ -32,10 +32,33 @@ export const useAddSubTask = () => {
   });
 };
 
+export const useAddComment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data) => {
+      return await postData(`/tasks/${data.taskId}/add-comment`, {
+        text: data.text,
+      });
+    },
+    onSuccess: (_, { taskId }) => {
+      queryClient.invalidateQueries(["comments", taskId]);
+      queryClient.invalidateQueries(["task-activity", taskId]);
+    },
+  });
+};
+
 export const useTaskByIdQuery = (taskId) => {
   return useQuery({
     queryKey: ["task", taskId],
     queryFn: () => getData(`/tasks/${taskId}`),
+  });
+};
+
+export const useCommentByIdQuery = (taskId) => {
+  return useQuery({
+    queryKey: ["comments", taskId],
+    queryFn: () => getData(`/tasks/${taskId}/comments`),
   });
 };
 

@@ -3,6 +3,7 @@ import { validateRequest } from "zod-express-middleware";
 import authMiddleware from "../middleware/auth.middleware.js";
 import {
   assigneesSchema,
+  commentSchema,
   descriptionSchema,
   parmsProjectIdSchema,
   parmsResourceIdSchema,
@@ -16,9 +17,11 @@ import {
   titleSchema,
 } from "../libs/validateSchema.js";
 import {
+  addComment,
   addSubTask,
   createTask,
   getActivityByResourceId,
+  getCommentByTaskId,
   getTaskById,
   updateSubTask,
   updateTaskAssignees,
@@ -48,6 +51,16 @@ router.post(
     body: subTaskSchema,
   }),
   addSubTask
+);
+
+router.post(
+  "/:taskId/add-comment",
+  authMiddleware,
+  validateRequest({
+    params: parmsTaskIdSchema,
+    body: commentSchema,
+  }),
+  addComment
 );
 
 router.put(
@@ -126,6 +139,15 @@ router.get(
     params: parmsResourceIdSchema,
   }),
   getActivityByResourceId
+);
+
+router.get(
+  "/:taskId/comments",
+  authMiddleware,
+  validateRequest({
+    params: parmsTaskIdSchema,
+  }),
+  getCommentByTaskId
 );
 
 export default router;
