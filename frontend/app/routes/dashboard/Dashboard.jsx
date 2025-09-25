@@ -1,5 +1,7 @@
+import RecentProjects from "@/components/dashboard/RecentProjects";
 import StatisticsCharts from "@/components/dashboard/StatisticsCharts";
 import StatsCard from "@/components/dashboard/StatsCard";
+import UpcomingTasks from "@/components/dashboard/UpcomingTasks";
 import Loader from "@/components/Loader";
 import { useGetWorkspaceStatusQuery } from "@/hooks/useWorkspace";
 import React from "react";
@@ -30,6 +32,15 @@ const Dashboard = () => {
         taskPriorityData={data.taskPriorityData}
         workspaceProductivityData={data.workspaceProductivityData}
       />
+
+      <div className="flex flex-col lg:flex-row gap-6">
+        <div className="flex-1">
+          <RecentProjects data={data.recentProjects} />
+        </div>
+        <div className="flex-1">
+          <UpcomingTasks data={data.upcomingTasks} />
+        </div>
+      </div>
     </div>
   );
 };
