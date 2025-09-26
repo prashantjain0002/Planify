@@ -7,6 +7,13 @@ export const useCreateWorkspaceMutation = () => {
   });
 };
 
+export const useInviteMemberMutation = () => {
+  return useMutation({
+    mutationFn: async (data) =>
+      postData(`/workspace/${data.workspaceId}/invite-member`, data),
+  });
+};
+
 export const useGetWorkspacesQuery = () => {
   return useQuery({
     queryKey: ["workspaces"],
@@ -23,14 +30,14 @@ export const useGetWorkspaceQuery = (workspaceId) => {
 
 export const useGetWorkspaceStatusQuery = (workspaceId) => {
   return useQuery({
-    queryKey: ["workspace", workspaceId, 'status'],
+    queryKey: ["workspace", workspaceId, "status"],
     queryFn: async () => await getData(`/workspace/${workspaceId}/stats`),
   });
 };
 
 export const useGetWorkspaceDetailsQuery = (workspaceId) => {
   return useQuery({
-    queryKey: ["workspace", workspaceId, 'details'],
+    queryKey: ["workspace", workspaceId, "details"],
     queryFn: async () => await getData(`/workspace/${workspaceId}`),
   });
 };

@@ -1,5 +1,10 @@
 import Workspace from "./../models/workspace.model.js";
 import Project from "./../models/project.model.js";
+import User from "../models/user.model.js";
+import WorkspaceInvite from "../models/wrokspaceInvite.model.js";
+import jwt from "jsonwebtoken";
+import { sendEmail } from "./../libs/sendEmail.js";
+import { recordActivity } from "./../libs/index.js";
 
 export const createWorkspace = async (req, res) => {
   try {
@@ -13,6 +18,205 @@ export const createWorkspace = async (req, res) => {
     });
 
     res.status(201).json(workspace);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const inviteUserToWorkspace = async (req, res) => {
+  try {
+    const { workspaceId } = req.params;
+    const { email, role } = req.body;
+
+    const workspace = await Workspace.findById(workspaceId);
+    if (!workspace) {
+      return res.status(404).json({ message: "Workspace not found" });
+    }
+
+    const userMemberInfo = workspace.members.find(
+      (member) => member.user.toString() === req.user._id.toString()
+    );
+
+    if (!userMemberInfo || !["admin", "owner"].includes(userMemberInfo.role)) {
+      return res.status(403).json({
+        message: "You are not authorized to invite members to this workspace",
+      });
+    }
+
+    const existingMember = await User.findOne({ email });
+    if (!existingMember) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const isMember = workspace.members.some(
+      (member) => member.user.toString() === existingMember._id.toString()
+    );
+    if (isMember) {
+      return res
+        .status(400)
+        .json({ message: "User is already a member of this workspace" });
+    }
+
+    const isInvited = await WorkspaceInvite.findOne({
+      user: existingMember._id,
+      workspaceId,
+    });
+
+    if (isInvited && isInvited.expiresAt > new Date()) {
+      return res
+        .status(400)
+        .json({ message: "User is already invited to this workspace" });
+    }
+
+    if (isInvited && isInvited.expiresAt < new Date()) {
+      await WorkspaceInvite.deleteOne({ _id: isInvited._id });
+    }
+
+    const inviteToken = jwt.sign(
+      {
+        user: existingMember._id,
+        workspaceId,
+        role: role || "member",
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    await WorkspaceInvite.create({
+      user: existingMember._id,
+      workspaceId,
+      token: inviteToken,
+      role: role || "member",
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    });
+
+    // Send email
+    const invitationLink = `${process.env.FRONTEND_URL}/workspace-invite/${workspace._id}?tk=${inviteToken}`;
+
+    const emailResult = await sendEmail(
+      existingMember.email,
+      "Invitation to join workspace",
+      "views/workspaceInvitation.ejs",
+      {
+        name: existingMember.name,
+        invitationLink,
+        workspaceName: workspace.name,
+      }
+    );
+
+    if (!emailResult.success) {
+      return res.status(201).json({
+        message:
+          "User invited successfully, but failed to send invitation email.",
+        emailError: emailResult.error,
+      });
+    }
+
+    res.status(200).json({ message: "User invited successfully" });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
+  }
+};
+
+export const acceptInviteToken = async (req, res) => {
+  try {
+    const { token } = req.body;
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const { user, workspaceId, role } = decoded;
+
+    const workspace = await Workspace.findById(workspaceId);
+    if (!workspace) {
+      return res.status(404).json({ message: "Workspace not found" });
+    }
+
+    const isMember = workspace.members.some(
+      (member) => member.user.toString() === user.toString()
+    );
+    if (isMember) {
+      return res
+        .status(403)
+        .json({ message: "User already a member of this workspace" });
+    }
+
+    const inviteInfo = await WorkspaceInvite.findOne({
+      user: user,
+      workspaceId: workspaceId,
+    });
+    if (!inviteInfo) {
+      return res.status(404).json({ message: "Invite not found" });
+    }
+
+    if (inviteInfo.expiresAt < new Date()) {
+      return res.status(401).json({ message: "Invite expired" });
+    }
+
+    workspace.members.push({
+      user: user,
+      role: role || [],
+      joinedAt: Date.now(),
+    });
+    await workspace.save();
+
+    await Promise.all([
+      WorkspaceInvite.deleteOne({ _id: inviteInfo._id }),
+      recordActivity(user, "joined_workspace", "Workspace", workspaceId, {
+        description: `Joined ${workspace.name} workspace`,
+      }),
+    ]);
+
+    res.status(200).json({
+      message: "Invitation accepted successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const acceptGenerateInvite = async (req, res) => {
+  try {
+    const { workspaceId } = req.params;
+    const { name, description, color } = req.body;
+
+    const workspace = await Workspace.findById(workspaceId);
+    if (!workspace) {
+      return res.status(404).json({ message: "Workspace not found" });
+    }
+
+    const isMember = workspace.members.some(
+      (member) => member.user.toString() === user.toString()
+    );
+    if (isMember) {
+      return res
+        .status(403)
+        .json({ message: "User already a member of this workspace" });
+    }
+
+    workspace.members.push({
+      user: req.user._id,
+      role: "member",
+      joinedAt: new Date(),
+    });
+    await workspace.save();
+
+    await recordActivity(
+      req.user._id,
+      "joined_workspace",
+      "Workspace",
+      workspaceId,
+      {
+        description: `Joined ${workspace.name} workspace`,
+      }
+    );
+
+    res.status(200).json({
+      message: "Invitation accepted successfully",
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Internal server error" });

@@ -6,6 +6,7 @@ import { useGetWorkspaceQuery } from "@/hooks/useWorkspace";
 import React, { useState } from "react";
 import { useParams } from "react-router";
 import { motion } from "framer-motion";
+import InviteMemberDialog from "@/components/workspace/InviteMemberDialog";
 
 const containerVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -61,6 +62,12 @@ const WorkspaceDetails = () => {
         onOpenChange={setIsCreateProject}
         workspaceId={workspaceId}
         workspaceMembers={workspace?.workspace?.members}
+      />
+
+      <InviteMemberDialog
+        isOpen={isInviteMember}
+        onOpenChange={setIsInviteMember}
+        workspaceId={workspaceId}
       />
     </motion.div>
   );

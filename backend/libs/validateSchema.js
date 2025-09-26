@@ -10,6 +10,9 @@ export const parmsSubTaskIdSchema = z.object({
 export const parmsResourceIdSchema = z.object({ resourceId: z.string() });
 
 export const titleSchema = z.object({ title: z.string() });
+export const emailSchema = z.object({
+  email: z.string().email("Invalid email"),
+});
 export const descriptionSchema = z.object({ description: z.string() });
 export const statusSchema = z.object({ status: z.string() });
 export const assigneesSchema = z.object({
@@ -93,4 +96,13 @@ export const subTaskSchema = z.object({
 
 export const commentSchema = z.object({
   text: z.string(),
+});
+
+export const tokenSchema = z.object({
+  token: z.string(),
+});
+
+export const inviteMemberSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  role: z.enum(["admin", "member", "viewer"]),
 });
