@@ -90,6 +90,13 @@ export const useCommentByIdQuery = (taskId) => {
   });
 };
 
+export const useGetMyTasksQuery = () => {
+  return useQuery({
+    queryKey: ["my-tasks", "user"],
+    queryFn: () => getData(`/tasks/my-tasks`),
+  });
+};
+
 export const useActivityByResourceIdQuery = (resourceId) => {
   return useQuery({
     queryKey: ["task-activity", resourceId],

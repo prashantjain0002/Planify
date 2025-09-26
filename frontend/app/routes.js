@@ -25,5 +25,6 @@ export default [
       "workspace/:workspaceId/projects/:projectId/tasks/:taskId",
       "routes/dashboard/task/TaskDetails.jsx"
     ),
+    route("my-tasks", "routes/dashboard/MyTasks.jsx"),
   ]),
 ];

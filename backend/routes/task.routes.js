@@ -23,6 +23,7 @@ import {
   createTask,
   getActivityByResourceId,
   getCommentByTaskId,
+  getMyTasks,
   getTaskById,
   updateSubTask,
   updateTaskAssignees,
@@ -142,6 +143,8 @@ router.put(
   }),
   updateSubTask
 );
+
+router.get("/my-tasks", authMiddleware, getMyTasks);
 
 router.get(
   "/:taskId",

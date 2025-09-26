@@ -287,6 +287,26 @@ export const getCommentByTaskId = async (req, res) => {
   }
 };
 
+export const getMyTasks = async (req, res) => {
+  try {
+ console.log(req.user._id);
+ 
+
+    const tasks = await Task.find({ assignees: { $in: [req.user._id] } })
+      .populate("project", "title workspace")
+      .sort({ createdAt: -1 });
+
+    if (!tasks || tasks.length === 0) {
+      return res.status(404).json({ message: "No tasks found" });
+    }
+
+    res.status(200).json(tasks);
+  } catch (error) {
+    console.error("Error in getMyTasks:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export const updateTaskTitle = async (req, res) => {
   try {
     const { taskId } = req.params;
