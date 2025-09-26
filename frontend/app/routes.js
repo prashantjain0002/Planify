@@ -26,5 +26,6 @@ export default [
       "routes/dashboard/task/TaskDetails.jsx"
     ),
     route("my-tasks", "routes/dashboard/MyTasks.jsx"),
+    route("members", "routes/dashboard/Members.jsx"),
   ]),
 ];
