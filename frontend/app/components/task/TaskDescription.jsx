@@ -31,34 +31,36 @@ const TaskDescription = ({ description, taskId }) => {
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-start gap-2 w-full">
       {isEditing ? (
-        <Textarea
-          className={"w-full min-w-3xl"}
-          value={newDescription}
-          onChange={(e) => setNewDescription(e.target.value)}
-          disabled={isPending}
-        />
+        <>
+          <Textarea
+            className="flex-1 min-h-[3rem] resize-none"
+            value={newDescription}
+            onChange={(e) => setNewDescription(e.target.value)}
+            disabled={isPending}
+          />
+          <Button
+            className="my-auto self-start flex-shrink-0"
+            size="sm"
+            onClick={updateDescription}
+            disabled={isPending}
+          >
+            {isPending ? <Loader /> : "Save"}
+          </Button>
+        </>
       ) : (
-        <div className="text-sm flex-1 text-pretty">
-          {description}
-        </div>
-      )}
-
-      {isEditing ? (
-        <Button
-          className={"py-0"}
-          size={"sm"}
-          onClick={updateDescription}
-          disabled={isPending}
-        >
-          {isPending ? <Loader /> : "Save"}
-        </Button>
-      ) : (
-        <Edit
-          className="size-5 cursor-pointer text-blue-500 hover:text-blue-600"
-          onClick={() => setIsEditing(true)}
-        />
+        <>
+          <div className="flex-1 text-sm text-pretty break-words">
+            {description}
+          </div>
+          <div className="flex-shrink-0">
+            <Edit
+              className="size-5 cursor-pointer text-blue-500 hover:text-blue-600"
+              onClick={() => setIsEditing(true)}
+            />
+          </div>
+        </>
       )}
     </div>
   );
