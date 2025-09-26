@@ -28,4 +28,9 @@ export default [
     route("my-tasks", "routes/dashboard/MyTasks.jsx"),
     route("members", "routes/dashboard/Members.jsx"),
   ]),
+
+  route(
+    "workspace-invite/:workspaceId",
+    "routes/dashboard/workspaces/WorkspaceInvite.jsx"
+  ),
 ];

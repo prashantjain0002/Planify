@@ -14,6 +14,20 @@ export const useInviteMemberMutation = () => {
   });
 };
 
+export const useAcceptInviteMemberMutation = () => {
+  return useMutation({
+    mutationFn: async (token) =>
+      postData(`/workspace/accept-invite-token`, { token }),
+  });
+};
+
+export const useAcceptGenerateInviteMutation = () => {
+  return useMutation({
+    mutationFn: async (workspaceId) =>
+      postData(`/workspace/${workspaceId}/accept-generate-invite`, {}),
+  });
+};
+
 export const useGetWorkspacesQuery = () => {
   return useQuery({
     queryKey: ["workspaces"],
