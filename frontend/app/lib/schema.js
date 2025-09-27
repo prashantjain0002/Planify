@@ -90,5 +90,27 @@ export const taskSchema = z.object({
 
 export const inviteMemberSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
-  role: z.enum(["admin", "member", "viewer"])
+  role: z.enum(["admin", "member", "viewer"]),
+});
+
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z
+      .string()
+      .min(8, { message: "Password must be at least 8 characters long" }),
+    newPassword: z
+      .string()
+      .min(8, { message: "New password must be at least 8 characters long" }),
+    confirmPassword: z.string().min(8, {
+      message: "Confirm password must be at least 8 characters long",
+    }),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    path: ["confirmPassword"],
+    message: "Passwords do not match",
+  });
+
+export const profileSchema = z.object({
+  name: z.string().min(1, { message: "Name is required" }),
+  profilePicture: z.string().optional(),
 });
