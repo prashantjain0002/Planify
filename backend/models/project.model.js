@@ -47,7 +47,7 @@ const projectSchema = new Schema(
         },
         role: {
           type: String,
-          enum: ["manager", "contributor", "viewer"],
+          enum: ["admin", "contributor", "viewer"],
           default: "contributor",
         },
       },

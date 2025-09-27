@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Checkbox } from "../ui/checkbox";
 import { Button } from "../ui/button";
@@ -6,32 +6,35 @@ import { useUpdateTaskAssigneesMutatuion } from "@/hooks/useTask";
 import { toast } from "sonner";
 
 const TaskAssigneesSelector = ({ task, assignees, projectMembers }) => {
-  const [selectedIds, setSelectedIds] = useState(
-    assignees.map((assignee) => assignee._id)
-  );
+  const [selectedIds, setSelectedIds] = useState([]);
   const [dropDownOpen, setDropDownOpen] = useState(false);
-
   const { mutate, isPending } = useUpdateTaskAssigneesMutatuion();
 
-  const handleSelectAll = () => {
-    const allIds = projectMembers.map((m) => m.user._id);
-    setSelectedIds(allIds);
-  };
 
-  const handleUnSelectAll = () => {
-    setSelectedIds([]);
-  };
-
-  const handleSelect = (id) => {
-    let newSelected = [];
-    if (selectedIds.includes(id)) {
-      newSelected = selectedIds.filter((sid) => sid !== id);
-    } else {
-      newSelected = [...selectedIds, id];
+  const normalizedMembers = projectMembers.map((m) => {
+    if (m.user) {
+      return {
+        _id: m.user._id,
+        name: m.user.name,
+        profilePicture: m.user.profilePicture,
+      };
     }
+    return m; 
+  });
 
-    setSelectedIds(newSelected);
-  };
+  useEffect(() => {
+    setSelectedIds(
+      assignees.map((a) => a._id || a.user?._id) 
+    );
+  }, [assignees]);
+
+  const handleSelectAll = () =>
+    setSelectedIds(normalizedMembers.map((m) => m._id));
+  const handleUnSelectAll = () => setSelectedIds([]);
+  const handleSelect = (id) =>
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
 
   const handleSaveAssignees = () => {
     mutate(
@@ -39,12 +42,11 @@ const TaskAssigneesSelector = ({ task, assignees, projectMembers }) => {
       {
         onSuccess: () => {
           setDropDownOpen(false);
-          toast.success("Task assignees updated successfully");
+          toast.success("Assignees updated");
         },
-        onError: (error) => {
-          const errorMessage = error?.message;
-          console.log(error);
-          toast.error(errorMessage);
+        onError: (e) => {
+          console.error(e);
+          toast.error(e?.message || "Failed");
         },
       }
     );
@@ -58,20 +60,19 @@ const TaskAssigneesSelector = ({ task, assignees, projectMembers }) => {
         {selectedIds.length === 0 ? (
           <span className="text-xs text-muted-foreground">Unassigned</span>
         ) : (
-          projectMembers
-            .filter((member) => selectedIds.includes(member.user._id))
+          normalizedMembers
+            .filter((m) => selectedIds.includes(m._id))
             .map((m) => (
               <div
                 key={m._id}
-                className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-1 shadow-sm hover:shadow-md transition-shadow cursor-no-drop"
+                className="flex items-center gap-2 bg-white border rounded-lg px-3 py-1 shadow-sm hover:shadow-md transition-shadow cursor-no-drop"
               >
                 <Avatar className="w-6 h-6">
-                  <AvatarImage src={m.user.profilePicture} alt={m.user.name} />
-                  <AvatarFallback>{m.user.name.charAt(0)}</AvatarFallback>
+                  <AvatarImage src={m.profilePicture} />
+                  <AvatarFallback>{m.name.charAt(0)}</AvatarFallback>
                 </Avatar>
-
                 <span className="text-sm font-medium text-gray-700">
-                  {m.user.name}
+                  {m.name}
                 </span>
               </div>
             ))
@@ -92,53 +93,49 @@ const TaskAssigneesSelector = ({ task, assignees, projectMembers }) => {
           <div className="absolute top-full w-full bg-white border rounded z-10 mt-1 shadow-lg max-h-60 overflow-y-auto">
             <div className="flex justify-between px-2 py-1 border-b">
               <button
-                className="text-xs text-blue-600 cursor-pointer font-semibold hover:text-blue-700"
+                className="text-xs text-blue-600 font-semibold hover:text-blue-700"
                 onClick={handleSelectAll}
               >
                 Select all
               </button>
-
               <button
-                className="text-xs text-red-600 cursor-pointer font-semibold hover:text-red-700"
+                className="text-xs text-red-600 font-semibold hover:text-red-700"
                 onClick={handleUnSelectAll}
               >
                 Unselect all
               </button>
             </div>
 
-            {projectMembers.map((m) => (
+            {normalizedMembers.map((m) => (
               <label
+                key={m._id}
                 className="flex items-center px-3 py-2 cursor-pointer hover:bg-gray-50"
-                key={m.user._id}
               >
                 <Checkbox
-                  checked={selectedIds.includes(m.user._id)}
-                  onCheckedChange={() => handleSelect(m.user._id)}
-                  className={"mr-2"}
+                  checked={selectedIds.includes(m._id)}
+                  onCheckedChange={() => handleSelect(m._id)}
+                  className="mr-2"
                 />
-
-                <Avatar className={"size-6 mr-2"}>
-                  <AvatarImage src={m.user.profilePicture} />
-                  <AvatarFallback>{m.user.name.charAt(0)}</AvatarFallback>
+                <Avatar className="size-6 mr-2">
+                  <AvatarImage src={m.profilePicture} />
+                  <AvatarFallback>{m.name.charAt(0)}</AvatarFallback>
                 </Avatar>
-
-                <span>{m.user.name}</span>
+                <span>{m.name}</span>
               </label>
             ))}
 
             <div className="flex justify-between px-2 py-1">
               <Button
-                variant={"outline"}
-                size={"sm"}
+                variant="outline"
+                size="sm"
                 onClick={() => setDropDownOpen(false)}
                 disabled={isPending}
               >
                 Cancel
               </Button>
-
               <Button
-                size={"sm"}
-                onClick={() => handleSaveAssignees()}
+                size="sm"
+                onClick={handleSaveAssignees}
                 disabled={isPending}
               >
                 Save

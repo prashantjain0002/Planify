@@ -181,15 +181,15 @@ export const acceptInviteToken = async (req, res) => {
 export const acceptGenerateInvite = async (req, res) => {
   try {
     const { workspaceId } = req.params;
-    const { name, description, color } = req.body;
 
     const workspace = await Workspace.findById(workspaceId);
     if (!workspace) {
       return res.status(404).json({ message: "Workspace not found" });
     }
 
+    // Check if user is already a member
     const isMember = workspace.members.some(
-      (member) => member.user.toString() === user.toString()
+      (member) => member.user.toString() === req.user._id.toString()
     );
     if (isMember) {
       return res
@@ -197,6 +197,7 @@ export const acceptGenerateInvite = async (req, res) => {
         .json({ message: "User already a member of this workspace" });
     }
 
+    // Add user to workspace
     workspace.members.push({
       user: req.user._id,
       role: "member",
@@ -204,6 +205,21 @@ export const acceptGenerateInvite = async (req, res) => {
     });
     await workspace.save();
 
+    // ✅ Add user to all projects inside this workspace
+    await Project.updateMany(
+      { workspace: workspaceId },
+      {
+        $addToSet: {
+          members: {
+            user: req.user._id,
+            role: "member",
+            joinedAt: new Date(),
+          },
+        },
+      }
+    );
+
+    // Log activity
     await recordActivity(
       req.user._id,
       "joined_workspace",
@@ -218,7 +234,7 @@ export const acceptGenerateInvite = async (req, res) => {
       message: "Invitation accepted successfully",
     });
   } catch (error) {
-    console.log(error);
+    console.log("Error in acceptGenerateInvite:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };

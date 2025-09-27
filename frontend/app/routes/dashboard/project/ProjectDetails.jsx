@@ -14,6 +14,7 @@ import { AlertCircle, Calendar, CheckCircle, Clock } from "lucide-react";
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { motion } from "framer-motion";
+import { useGetWorkspaceQuery } from "@/hooks/useWorkspace";
 
 const ProjectDetails = () => {
   const [isCreateTask, setIsCreateTask] = useState(false);
@@ -21,6 +22,9 @@ const ProjectDetails = () => {
   const { projectId, workspaceId } = useParams();
 
   const { data, isLoading } = useProjectQuery(projectId);
+  const { data: workspace, isLoading: isWorkspaceLoading } =
+    useGetWorkspaceQuery(workspaceId);
+
   const navigate = useNavigate();
 
   if (isLoading) return <Loader />;
@@ -174,7 +178,7 @@ const ProjectDetails = () => {
         open={isCreateTask}
         onOpenChange={setIsCreateTask}
         projectId={projectId}
-        projectMembers={project.members}
+        projectMembers={workspace.members}
       />
     </motion.div>
   );

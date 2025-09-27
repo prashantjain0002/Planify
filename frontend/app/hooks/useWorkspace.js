@@ -35,10 +35,20 @@ export const useGetWorkspacesQuery = () => {
   });
 };
 
+// export const useGetWorkspaceQuery = (workspaceId) => {
+//   return useQuery({
+//     queryKey: ["workspace", workspaceId],
+//     queryFn: async () => await getData(`/workspace/${workspaceId}/projects`),
+//   });
+// };
+
 export const useGetWorkspaceQuery = (workspaceId) => {
   return useQuery({
     queryKey: ["workspace", workspaceId],
-    queryFn: async () => await getData(`/workspace/${workspaceId}/projects`),
+    queryFn: async () => {
+      const res = await getData(`/workspace/${workspaceId}/projects`);
+      return res.workspace; // <- make sure we return the workspace object
+    },
   });
 };
 

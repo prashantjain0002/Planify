@@ -55,10 +55,10 @@ const WorkSpaceHeader = ({
               }
             >
               <AvatarImage
-                src={member.user.profilePicture}
-                alt={member.user.name}
+                src={member.user?.profilePicture}
+                alt={member.user?.name}
               />
-              <AvatarFallback>{member.user.name.charAt(0)}</AvatarFallback>
+              <AvatarFallback>{member.user?.name.charAt(0)}</AvatarFallback>
             </Avatar>
           ))}
         </div>

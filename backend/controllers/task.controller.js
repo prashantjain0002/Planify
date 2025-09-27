@@ -238,11 +238,14 @@ export const getTaskById = async (req, res) => {
 
     const project = await Project.findById(task.project).populate(
       "members.user",
-      "name profilePicture"
+      "name profilePicture email"
     );
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
     }
+
+    console.log(project);
+    
 
     res.status(200).json({ task, project });
   } catch (error) {
