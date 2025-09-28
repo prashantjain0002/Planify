@@ -101,15 +101,15 @@ const Header = ({
           </Button>
 
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+            <DropdownMenuTrigger>
               <Avatar className="h-8 w-8 cursor-pointer">
-                {user?.profilePicture ? (
-                  <AvatarImage src={user.profilePicture} />
-                ) : (
-                  <AvatarFallback className="bg-black text-white">
-                    {user?.name?.charAt(0).toUpperCase() || "U"}
-                  </AvatarFallback>
-                )}
+                <AvatarImage
+                  src={user?.profilePicture || ""}
+                  onError={(e) => (e.currentTarget.style.display = "none")}
+                />
+                <AvatarFallback className="bg-black text-white">
+                  {user?.name?.charAt(0).toUpperCase() || "U"}
+                </AvatarFallback>
               </Avatar>
             </DropdownMenuTrigger>
 

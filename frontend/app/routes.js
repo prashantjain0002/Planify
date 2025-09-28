@@ -27,11 +27,15 @@ export default [
     ),
     route("my-tasks", "routes/dashboard/MyTasks.jsx"),
     route("members", "routes/dashboard/Members.jsx"),
-    route("settings", "routes/settings/Profile.jsx"),
+    // route("settings", "routes/settings/Profile.jsx"),
   ]),
 
   route(
     "workspace-invite/:workspaceId",
     "routes/dashboard/workspaces/WorkspaceInvite.jsx"
   ),
+
+  layout("routes/user/UserLayout.jsx", [
+    route("user/profile", "routes/user/Profile.jsx"),
+  ]),
 ];
