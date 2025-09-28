@@ -17,12 +17,17 @@ import { useSearchParams } from "react-router";
 import { motion } from "framer-motion";
 import { useGetWorkspaceDetailsQuery } from "@/hooks/useWorkspace";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useWorkspace } from "@/lib/provider/workspaceContext";
 
 const Members = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const workspaceId = searchParams.get("workspaceId");
   const initialSearch = searchParams.get("search") || "";
   const [search, setSearch] = useState(initialSearch);
+  
+  const { selectedWorkspace } = useWorkspace();
+  const workspaceId = selectedWorkspace?._id || searchParams.get("workspaceId");
+
+  console.log(workspaceId);
 
   const { data, isLoading } = useGetWorkspaceDetailsQuery(workspaceId || "0");
 

@@ -29,9 +29,13 @@ const WorkspaceDetails = () => {
 
   if (!workspaceId) return <div>No Workspace found</div>;
 
-  const { data: workspace, isLoading } = useGetWorkspaceQuery(workspaceId);
+  const { data, isLoading } = useGetWorkspaceQuery(workspaceId);
+  
 
   if (isLoading) return <Loader />;
+
+  console.log(data);
+  
 
   return (
     <motion.div
@@ -42,8 +46,8 @@ const WorkspaceDetails = () => {
     >
       <motion.div variants={itemVariants}>
         <WorkSpaceHeader
-          workspace={workspace.workspace}
-          members={workspace?.workspace?.members}
+          workspace={data?.workspace}
+          members={data?.workspace?.members}
           onCreateProject={() => setIsCreateProject(true)}
           onInviteMember={() => setIsInviteMember(true)}
         />
@@ -52,7 +56,7 @@ const WorkspaceDetails = () => {
       <motion.div variants={itemVariants}>
         <ProjectList
           workspaceId={workspaceId}
-          projects={workspace?.projects}
+          projects={data?.projects}
           onCreateProject={() => setIsCreateProject(true)}
         />
       </motion.div>
@@ -61,7 +65,7 @@ const WorkspaceDetails = () => {
         isOpen={isCreateProject}
         onOpenChange={setIsCreateProject}
         workspaceId={workspaceId}
-        workspaceMembers={workspace?.workspace?.members}
+        workspaceMembers={data?.workspace?.members}
       />
 
       <InviteMemberDialog

@@ -14,6 +14,9 @@ import { CalendarDays } from "lucide-react";
 import { format } from "date-fns";
 
 const ProjectCard = ({project, progress, workspaceId}) => {
+
+  console.log(project);
+  
   
 
   return (
@@ -49,7 +52,7 @@ const ProjectCard = ({project, progress, workspaceId}) => {
 
             <div className="flex items-center justify-between">
               <div className="flex items-center text-sm gap-2 text-muted-foreground">
-                <span>{project?.tasks.length}</span>
+                <span>{project?.tasks.length || 0}</span>
                 <span>Tasks</span>
               </div>
 

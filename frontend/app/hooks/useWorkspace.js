@@ -42,13 +42,20 @@ export const useGetWorkspacesQuery = () => {
 //   });
 // };
 
+// export const useGetWorkspaceQuery = (workspaceId) => {
+//   return useQuery({
+//     queryKey: ["workspace", workspaceId, "projects"],
+//     queryFn: async () => {
+//       const res = await getData(`/workspace/${workspaceId}/projects`);
+//       // <- make sure we return the workspace object
+//     },
+//   });
+// };
+
 export const useGetWorkspaceQuery = (workspaceId) => {
   return useQuery({
-    queryKey: ["workspace", workspaceId],
-    queryFn: async () => {
-      const res = await getData(`/workspace/${workspaceId}/projects`);
-      return res.workspace; // <- make sure we return the workspace object
-    },
+    queryKey: ["workspace", workspaceId, "projects"],
+    queryFn: async () => await getData(`/workspace/${workspaceId}/projects`),
   });
 };
 
