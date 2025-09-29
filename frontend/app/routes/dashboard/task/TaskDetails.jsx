@@ -32,7 +32,6 @@
 //     transition: { staggerChildren: 0.15, when: "beforeChildren" },
 //   },
 // };
-
 // const itemVariants = {
 //   hidden: { opacity: 0, y: 20 },
 //   visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
@@ -40,8 +39,7 @@
 
 // const TaskDetails = () => {
 //   const { user } = useAuth();
-//   const { taskId, projectId, workspaceId } = useParams();
-
+//   const { taskId, workspaceId } = useParams();
 //   const navigate = useNavigate();
 
 //   const { data, isLoading } = useTaskByIdQuery(taskId);
@@ -50,7 +48,7 @@
 //   const { mutate: watchTask, isPending: isWatching } = useWatchTask();
 //   const { mutate: archiveTask, isPending: isArchiving } = useArchiveTask();
 
-//   if (isLoading) return <Loader />;
+//   if (isLoading || isWorkspaceLoading) return <Loader />;
 //   if (!data)
 //     return (
 //       <div className="flex items-center justify-center h-screen">
@@ -59,37 +57,35 @@
 //     );
 
 //   const { task, project } = data;
-//   const isUserWatching = task?.watchers?.some(
-//     (w) => w._id.toString() === user._id.toString()
-//   );
+//   const isUserWatching = task?.watchers?.some((w) => w._id === user._id);
 
-//   const handleWatchTask = () => {
+//   const handleWatchTask = () =>
 //     watchTask(
 //       { taskId: task._id },
 //       {
-//         onSuccess: () => {
-//           toast.success("Task Watched");
-//         },
-//         onError: (error) => {
-//           toast.error(error?.message || "Failed to watch task");
-//         },
+//         onSuccess: () => toast.success("Task Watched"),
+//         onError: (e) => toast.error(e?.message || "Failed"),
 //       }
 //     );
-//   };
-
-//   const handleArchiveTask = () => {
+//   const handleArchiveTask = () =>
 //     archiveTask(
 //       { taskId: task._id },
 //       {
-//         onSuccess: () => {
-//           toast.success("Task Archived");
-//         },
-//         onError: (error) => {
-//           toast.error(error?.message || "Failed to archive task");
-//         },
+//         onSuccess: () => toast.success("Task Archived"),
+//         onError: (e) => toast.error(e?.message || "Failed"),
 //       }
 //     );
-//   };
+
+//   const allMembers = [
+//     ...(project?.members || []),
+//     ...(workspace?.members || []),
+//   ].reduce((acc, member) => {
+//     const exists = acc.find(
+//       (m) => m.user._id === (member.user?._id || member.user)
+//     );
+//     if (!exists) acc.push(member);
+//     return acc;
+//   }, []);
 
 //   console.log(workspace);
 
@@ -107,16 +103,15 @@
 //         <div className="flex flex-col md:flex-row md:items-center items-center">
 //           <Button
 //             onClick={() => navigate(-1)}
-//             variant={"outline"}
-//             size={"sm"}
-//             className={"p-4 me-4"}
+//             variant="outline"
+//             size="sm"
+//             className="p-4 me-4"
 //           >
 //             ← Back
 //           </Button>
 //           <h1 className="font-bold text-xl md:text-2xl">{task.title}</h1>
-
 //           {task.isArchived && (
-//             <Badge className={"ml-2"} variant={"destructive"}>
+//             <Badge className="ml-2" variant="destructive">
 //               Archived
 //             </Badge>
 //           )}
@@ -125,7 +120,7 @@
 //         <div className="flex gap-2 items-center">
 //           <Button
 //             variant={isUserWatching ? "destructive" : "outline"}
-//             size={"sm"}
+//             size="sm"
 //             onClick={handleWatchTask}
 //             disabled={isWatching}
 //           >
@@ -141,8 +136,8 @@
 //           </Button>
 
 //           <Button
-//             variant={"outline"}
-//             size={"sm"}
+//             variant="outline"
+//             size="sm"
 //             onClick={handleArchiveTask}
 //             disabled={isArchiving}
 //           >
@@ -174,9 +169,7 @@
 //                 >
 //                   {task.priority} Priority
 //                 </Badge>
-
 //                 <TaskTitle title={task.title} taskId={task._id} />
-
 //                 <div className="text-sm text-muted-foreground">
 //                   Created at{" "}
 //                   {formatDistanceToNow(new Date(task.createdAt), {
@@ -184,13 +177,12 @@
 //                   })}
 //                 </div>
 //               </div>
-
 //               <div className="flex items-center gap-2 mt-4 md:mt-0">
 //                 <TaskStatusSelector taskId={task._id} status={task.status} />
 //                 <Button
-//                   className={"hidden md:block"}
-//                   size={"sm"}
-//                   variant={"destructive"}
+//                   className="hidden md:block"
+//                   size="sm"
+//                   variant="destructive"
 //                 >
 //                   Delete Task
 //                 </Button>
@@ -207,25 +199,15 @@
 //               </div>
 //             </div>
 
-//             {/* <TaskAssigneesSelector
-//               task={task}
-//               assignees={task.assignees}
-//               projectMembers={project.members}
-//             /> */}
-
 //             <TaskAssigneesSelector
 //               task={task}
 //               assignees={task.assignees}
-//               projectMembers={[
-//                 ...(project?.members || []),
-//                 ...(workspace?.members || []), // merge workspace-level members
-//               ]}
+//               projectMembers={allMembers}
 //             />
-
 //             <TaskPrioritySelector priority={task.priority} taskId={task._id} />
 //             <SubTaskDetails subTasks={task?.subtasks || []} taskId={task._id} />
 //           </motion.div>
-//           <CommentSection taskId={task._id} members={project.members || []} />
+//           <CommentSection taskId={task._id} members={allMembers} />
 //         </motion.div>
 
 //         <motion.div variants={itemVariants} className="w-[30%] space-y-4">
@@ -263,7 +245,10 @@ import { Eye, EyeOff } from "lucide-react";
 import { useNavigate, useParams } from "react-router";
 import CommentSection from "@/components/task/CommentSection";
 import { toast } from "sonner";
-import { useGetWorkspaceQuery } from "@/hooks/useWorkspace";
+import {
+  useGetWorkspaceDetailsQuery,
+  useGetWorkspaceQuery,
+} from "@/hooks/useWorkspace";
 
 const containerVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -283,21 +268,38 @@ const TaskDetails = () => {
   const { taskId, workspaceId } = useParams();
   const navigate = useNavigate();
 
-  const { data, isLoading } = useTaskByIdQuery(taskId);
-  const { data: workspace, isLoading: isWorkspaceLoading } =
-    useGetWorkspaceQuery(workspaceId);
+  const { data: taskData, isLoading } = useTaskByIdQuery(taskId);
+  const { data: workspaceDetails, isLoading: isWorkspaceLoading } =
+    useGetWorkspaceDetailsQuery(workspaceId);
+  const { data: workspaceProjects } = useGetWorkspaceQuery(workspaceId); // array of projects
+
   const { mutate: watchTask, isPending: isWatching } = useWatchTask();
   const { mutate: archiveTask, isPending: isArchiving } = useArchiveTask();
 
   if (isLoading || isWorkspaceLoading) return <Loader />;
-  if (!data)
+  if (!taskData)
     return (
       <div className="flex items-center justify-center h-screen">
         <h1 className="text-2xl font-bold">Task not found</h1>
       </div>
     );
 
-  const { task, project } = data;
+  const { task, project } = taskData;
+  const workspaceMembers = workspaceDetails?.members || [];
+  const projectMembers = project?.members || [];
+
+  // Merge project and workspace members without duplicates
+  const allMembers = [...workspaceMembers, ...projectMembers].reduce(
+    (acc, member) => {
+      const exists = acc.find(
+        (m) => m.user._id === (member.user?._id || member.user)
+      );
+      if (!exists) acc.push(member);
+      return acc;
+    },
+    []
+  );
+
   const isUserWatching = task?.watchers?.some((w) => w._id === user._id);
 
   const handleWatchTask = () =>
@@ -308,27 +310,16 @@ const TaskDetails = () => {
         onError: (e) => toast.error(e?.message || "Failed"),
       }
     );
+
   const handleArchiveTask = () =>
     archiveTask(
       { taskId: task._id },
       {
-        onSuccess: () => toast.success("Task Archived"),
+        onSuccess: () =>
+          toast.success(task.isArchived ? "Task Unarchived" : "Task Archived"),
         onError: (e) => toast.error(e?.message || "Failed"),
       }
     );
-
-  const allMembers = [
-    ...(project?.members || []),
-    ...(workspace?.members || []),
-  ].reduce((acc, member) => {
-    const exists = acc.find(
-      (m) => m.user._id === (member.user?._id || member.user)
-    );
-    if (!exists) acc.push(member);
-    return acc;
-  }, []);
-
-  console.log(workspace?.members);
 
   return (
     <motion.div
@@ -337,6 +328,7 @@ const TaskDetails = () => {
       initial="hidden"
       animate="visible"
     >
+      {/* Header */}
       <motion.div
         variants={itemVariants}
         className="flex flex-col md:flex-row md:items-center justify-between mb-6"
@@ -358,7 +350,7 @@ const TaskDetails = () => {
           )}
         </div>
 
-        <div className="flex gap-2 items-center">
+        <div className="flex gap-2 items-center mt-2 md:mt-0">
           <Button
             variant={isUserWatching ? "destructive" : "outline"}
             size="sm"
@@ -382,15 +374,17 @@ const TaskDetails = () => {
             onClick={handleArchiveTask}
             disabled={isArchiving}
           >
-            {task?.isArchived ? "Unarchive" : "Archive"}
+            {task.isArchived ? "Unarchive" : "Archive"}
           </Button>
         </div>
       </motion.div>
 
+      {/* Main content */}
       <motion.div
         variants={itemVariants}
         className="flex flex-col lg:flex-row gap-4"
       >
+        {/* Left Column */}
         <motion.div variants={itemVariants} className="lg:col-span-2 w-[70%]">
           <motion.div
             variants={itemVariants}
@@ -412,7 +406,7 @@ const TaskDetails = () => {
                 </Badge>
                 <TaskTitle title={task.title} taskId={task._id} />
                 <div className="text-sm text-muted-foreground">
-                  Created at{" "}
+                  Created{" "}
                   {formatDistanceToNow(new Date(task.createdAt), {
                     addSuffix: true,
                   })}
@@ -448,9 +442,11 @@ const TaskDetails = () => {
             <TaskPrioritySelector priority={task.priority} taskId={task._id} />
             <SubTaskDetails subTasks={task?.subtasks || []} taskId={task._id} />
           </motion.div>
+
           <CommentSection taskId={task._id} members={allMembers} />
         </motion.div>
 
+        {/* Right Column */}
         <motion.div variants={itemVariants} className="w-[30%] space-y-4">
           <Watchers watchers={task?.watchers || []} />
           <TaskActivity resourceId={task._id} />

@@ -28,6 +28,7 @@ export default [
     route("my-tasks", "routes/dashboard/MyTasks.jsx"),
     route("members", "routes/dashboard/Members.jsx"),
     route("archived", "routes/dashboard/ArchivedTasks.jsx"),
+    route("settings", "routes/dashboard/Settings.jsx"),
   ]),
 
   route(

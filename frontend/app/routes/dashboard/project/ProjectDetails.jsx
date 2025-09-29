@@ -178,7 +178,7 @@ const ProjectDetails = () => {
         open={isCreateTask}
         onOpenChange={setIsCreateTask}
         projectId={projectId}
-        projectMembers={workspace.members}
+        projectMembers={workspace?.workspace?.members}
       />
     </motion.div>
   );
