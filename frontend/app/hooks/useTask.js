@@ -104,6 +104,14 @@ export const useActivityByResourceIdQuery = (resourceId) => {
   });
 };
 
+export const useGetArchivedTasksQuery = (workspaceId) => {
+  return useQuery({
+    queryKey: ["workspace", workspaceId, "archived-tasks"],
+    queryFn: async () => await getData(`/tasks/${workspaceId}/archived-tasks`),
+    enabled: !!workspaceId, // only run if we have a workspaceId
+  });
+};
+
 export const useUpdateTaskTitleMutatuion = () => {
   const queryClient = useQueryClient();
   return useMutation({

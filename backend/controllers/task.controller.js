@@ -225,6 +225,42 @@ export const archiveTask = async (req, res) => {
   }
 };
 
+export const unarchiveTask = async (req, res) => {
+  try {
+    const { taskId } = req.params;
+
+    const task = await Task.findById(taskId).populate({
+      path: "project",
+      select: "title workspace",
+    });
+
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    const workspace = await Workspace.findById(task.project.workspace);
+    if (!workspace) {
+      return res.status(404).json({ message: "Workspace not found" });
+    }
+
+    const member = workspace.members.find(
+      (m) => m.user.toString() === req.user._id.toString()
+    );
+
+    if (!member || !["owner", "admin"].includes(member.role)) {
+      return res.status(403).json({ message: "Not authorized to unarchive" });
+    }
+
+    task.isArchived = false;
+    await task.save();
+
+    res.status(200).json({ message: "Task unarchived successfully", task });
+  } catch (error) {
+    console.error("Unarchive error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export const getTaskById = async (req, res) => {
   try {
     const { taskId } = req.params;
@@ -245,7 +281,6 @@ export const getTaskById = async (req, res) => {
     }
 
     console.log(project);
-    
 
     res.status(200).json({ task, project });
   } catch (error) {
@@ -292,8 +327,7 @@ export const getCommentByTaskId = async (req, res) => {
 
 export const getMyTasks = async (req, res) => {
   try {
- console.log(req.user._id);
- 
+    console.log(req.user._id);
 
     const tasks = await Task.find({ assignees: { $in: [req.user._id] } })
       .populate("project", "title workspace")
@@ -306,6 +340,31 @@ export const getMyTasks = async (req, res) => {
     res.status(200).json(tasks);
   } catch (error) {
     console.error("Error in getMyTasks:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getArchivedTasks = async (req, res) => {
+  try {
+    const { workspaceId } = req.params;
+
+    const workspace = await Workspace.findOne({
+      _id: workspaceId,
+      "members.user": req.user._id,
+    }).populate("members.user", "name email profilePicture");
+
+    if (!workspace) {
+      return res.status(404).json({ message: "Workspace not found" });
+    }
+
+    const tasks = await Task.find({
+      project: { $in: workspace.projects }, // ✅ match projects
+      isArchived: true,
+    }).populate("project", "title");
+
+    res.status(200).json({ workspace, tasks });
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };

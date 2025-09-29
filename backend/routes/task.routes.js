@@ -22,9 +22,11 @@ import {
   archiveTask,
   createTask,
   getActivityByResourceId,
+  getArchivedTasks,
   getCommentByTaskId,
   getMyTasks,
   getTaskById,
+  unarchiveTask,
   updateSubTask,
   updateTaskAssignees,
   updateTaskDescription,
@@ -172,5 +174,7 @@ router.get(
   }),
   getCommentByTaskId
 );
+
+router.get("/:workspaceId/archived-tasks", authMiddleware, getArchivedTasks);
 
 export default router;
