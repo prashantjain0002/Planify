@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useParams, useNavigate, useSearchParams } from "react-router";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -11,7 +12,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
-import { Palette, SendToBack, Trash2 } from "lucide-react";
+import { Loader2, Palette, SendToBack, Trash2 } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -24,7 +25,14 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { workspaceSchema } from "@/lib/schema";
 import { cn } from "@/lib/utils";
-import { useNavigate } from "react-router";
+import {
+  useUpdateWorkspaceMutation,
+  useGetWorkspaceDetailsQuery,
+  useDeleteWorkspaceMutation,
+} from "@/hooks/useWorkspace";
+import { useWorkspace } from "@/lib/provider/workspaceContext";
+import { toast } from "sonner";
+import Loader from "@/components/Loader";
 
 export const colorOptions = [
   "#FF5733",
@@ -37,24 +45,58 @@ export const colorOptions = [
   "#34495E",
 ];
 
-const WorkspaceSettingsPage = () => {
-  const [workspaceName, setWorkspaceName] = useState("My Workspace");
-  const [description, setDescription] = useState("Describe your workspace...");
-  const [color, setColor] = useState("#4F46E5");
+const WorkspaceSettings = () => {
+  const [searchParams] = useSearchParams();
+  const { selectedWorkspace } = useWorkspace();
+  const workspaceId = selectedWorkspace?._id || searchParams.get("workspaceId");
+  const navigate = useNavigate();
   const [deleteOpen, setDeleteOpen] = useState(false);
 
-  const navigate = useNavigate();
+  const { data: workspace, isPending } =
+    useGetWorkspaceDetailsQuery(workspaceId);
+  const updateMutation = useUpdateWorkspaceMutation();
+  const { mutate: deleteWorkspace, isLoading } = useDeleteWorkspaceMutation();
 
   const form = useForm({
     resolver: zodResolver(workspaceSchema),
     defaultValues: {
-      name: "",
-      color: colorOptions[0],
-      description: "",
+      name: workspace?.name || "",
+      description: workspace?.description || "",
+      color: workspace?.color || colorOptions[0],
     },
+    values: workspace,
   });
 
-  const onSubmit = (data) => {};
+  const onSubmit = (data) => {
+    console.log(workspaceId, data);
+    updateMutation.mutate(
+      { workspaceId, data },
+      {
+        onSuccess: () => {
+          toast.success("Workspace updated successfully");
+        },
+        onError: (err) => {
+          const errorMessage = err?.message || "something went wrong";
+          console.log(err);
+          toast.error(errorMessage);
+        },
+      }
+    );
+  };
+
+  const handleDelete = () => {
+    deleteWorkspace(workspaceId, {
+      onSuccess: () => {
+        setDeleteOpen(false);
+        navigate("/workspaces");
+        toast.success("Workspace deleted successfully");
+      },
+      onError: (err) => {
+        const errorMessage = err?.message;
+        toast.error(errorMessage);
+      },
+    });
+  };
 
   return (
     <div className="mx-auto space-y-6">
@@ -66,93 +108,116 @@ const WorkspaceSettingsPage = () => {
       >
         ← Back
       </Button>
-      {/* 1. Workspace Settings */}
+
+      {/* Workspace Settings */}
       <motion.div
         className="bg-white shadow-lg rounded-3xl p-8 space-y-6"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="flex items-center gap-3 mb-4">
-          <Palette className="h-6 w-6 text-indigo-500" />
-          <h2 className="text-2xl font-semibold">Workspace Settings</h2>
-        </div>
+        {isPending ? (
+          <div className="flex items-center justify-center h-fit">
+            <Loader />
+          </div>
+        ) : (
+          <>
+            <div className="flex items-center gap-3 mb-4">
+              <Palette className="h-6 w-6 text-indigo-500" />
+              <h2 className="text-2xl font-semibold">Workspace Settings</h2>
+            </div>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="Workspace name"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-4"
+              >
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          placeholder="Workspace name"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      rows={4}
-                      placeholder="Workspace description"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          rows={4}
+                          placeholder="Workspace description"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-            <FormField
-              control={form.control}
-              name="color"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Color</FormLabel>
-                  <FormControl>
-                    <div className="flex gap-2 items-center">
-                      {colorOptions.map((color) => (
-                        <div
-                          className={cn(
-                            "w-6 h-6 rounded-full cursor-pointer hover:opacity-80 transition-all duration-300",
-                            field.value === color &&
-                              "ring-2 ring-offset-2 ring-offset-background ring-blue-500"
-                          )}
-                          key={color}
-                          style={{ backgroundColor: color }}
-                          onClick={() => field.onChange(color)}
-                        ></div>
-                      ))}
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                <FormField
+                  control={form.control}
+                  name="color"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Color</FormLabel>
+                      <FormControl>
+                        <div className="flex gap-2 items-center">
+                          {colorOptions.map((c) => (
+                            <div
+                              key={c}
+                              className={cn(
+                                "w-6 h-6 rounded-full cursor-pointer hover:opacity-80 transition-all duration-300",
+                                field.value === c &&
+                                  "ring-2 ring-offset-2 ring-offset-background ring-blue-500"
+                              )}
+                              style={{ backgroundColor: c }}
+                              onClick={() => field.onChange(c)}
+                            ></div>
+                          ))}
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-            <DialogFooter>
-              <Button type="submit" disabled={false}>
-                Create
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
+                <DialogFooter>
+                  <Button
+                    type="submit"
+                    disabled={isPending}
+                    className="flex items-center gap-2"
+                  >
+                    {isPending ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Saving...</span>
+                      </>
+                    ) : (
+                      "Save Changes"
+                    )}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </Form>
+          </>
+        )}
       </motion.div>
 
-      {/* 2. Transfer Workspace */}
+      {/* Transfer Workspace */}
       <motion.div
         className="bg-white shadow-lg rounded-3xl p-8 space-y-6"
         initial={{ opacity: 0, y: 20 }}
@@ -169,16 +234,13 @@ const WorkspaceSettingsPage = () => {
         </p>
         <div className="flex items-center gap-4 mt-4">
           <Input placeholder="New Owner's Email" />
-          <Button
-            className="px-6 py-2 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold shadow-md"
-            onClick={() => alert("Transfer request sent!")}
-          >
+          <Button className="px-6 py-2 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold shadow-md">
             Transfer
           </Button>
         </div>
       </motion.div>
 
-      {/* 3. Danger Zone */}
+      {/* Danger Zone */}
       <motion.div
         className="bg-white shadow-lg rounded-3xl p-8 space-y-6"
         initial={{ opacity: 0, y: 20 }}
@@ -200,7 +262,6 @@ const WorkspaceSettingsPage = () => {
           Delete Workspace
         </Button>
 
-        {/* Delete Confirmation Modal */}
         <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
           <DialogContent className="max-w-md">
             <DialogHeader>
@@ -216,9 +277,10 @@ const WorkspaceSettingsPage = () => {
               </Button>
               <Button
                 variant="destructive"
-                onClick={() => alert("Workspace Deleted!")}
+                onClick={handleDelete}
+                disabled={isLoading}
               >
-                Delete
+                {isLoading ? "Deleting..." : "Delete"}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -228,4 +290,4 @@ const WorkspaceSettingsPage = () => {
   );
 };
 
-export default WorkspaceSettingsPage;
+export default WorkspaceSettings;

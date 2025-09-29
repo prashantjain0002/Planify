@@ -1,5 +1,5 @@
-import { getData, postData } from "@/lib/fetchUtil";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { deleteData, getData, postData, updateData } from "@/lib/fetchUtil";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useCreateWorkspaceMutation = () => {
   return useMutation({
@@ -25,6 +25,25 @@ export const useAcceptGenerateInviteMutation = () => {
   return useMutation({
     mutationFn: async (workspaceId) =>
       postData(`/workspace/${workspaceId}/accept-generate-invite`, {}),
+  });
+};
+
+export const useTransferWorkspaceMutation = () => {
+  return useMutation({
+    mutationFn: ({ workspaceId, newOwnerEmail }) =>
+      postData(`/workspace/${workspaceId}/transfer`, { newOwnerEmail }),
+  });
+};
+
+export const useUpdateWorkspaceMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ workspaceId, data }) =>
+      updateData(`/workspace/${workspaceId}`, data),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries(["workspace", data._id, "details"]);
+      queryClient.invalidateQueries(["workspace", data._id, "projects"]);
+    },
   });
 };
 
@@ -70,5 +89,16 @@ export const useGetWorkspaceDetailsQuery = (workspaceId) => {
   return useQuery({
     queryKey: ["workspace", workspaceId, "details"],
     queryFn: async () => await getData(`/workspace/${workspaceId}`),
+  });
+};
+
+export const useDeleteWorkspaceMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (workspaceId) => deleteData(`/workspace/${workspaceId}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["workspace"] });
+    },
   });
 };

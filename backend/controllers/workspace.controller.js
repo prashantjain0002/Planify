@@ -5,6 +5,10 @@ import WorkspaceInvite from "../models/wrokspaceInvite.model.js";
 import jwt from "jsonwebtoken";
 import { sendEmail } from "./../libs/sendEmail.js";
 import { recordActivity } from "./../libs/index.js";
+import mongoose from "mongoose";
+import Task from './../models/task.model.js';
+import Comment from './../models/comment.model.js';
+import ActivityLog from "../models/activity.model.js";
 
 export const createWorkspace = async (req, res) => {
   try {
@@ -236,6 +240,70 @@ export const acceptGenerateInvite = async (req, res) => {
   } catch (error) {
     console.log("Error in acceptGenerateInvite:", error);
     res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const updateWorkspace = async (req, res) => {
+  try {
+    const { workspaceId } = req.params;
+    const updates = req.body;
+
+    // Optional: whitelist fields that can be updated
+    const allowedUpdates = ["name", "description", "color", "members"];
+    const filteredUpdates = {};
+    for (const key of allowedUpdates) {
+      if (updates[key] !== undefined) filteredUpdates[key] = updates[key];
+    }
+
+    if (Object.keys(filteredUpdates).length === 0) {
+      return res.status(400).json({ message: "No valid fields to update" });
+    }
+
+    // Find workspace and update
+    const workspace = await Workspace.findOneAndUpdate(
+      { _id: workspaceId },
+      { $set: filteredUpdates },
+      { new: true }
+    );
+    if (!workspace) {
+      return res.status(404).json({ message: "Workspace not found" });
+    }
+
+    return res.json(workspace);
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ message: "Error updating workspace", error: err.message });
+  }
+};
+
+export const transferWorkspace = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { newOwnerEmail } = req.body;
+
+    const newOwner = await User.findOne({ email: newOwnerEmail });
+    if (!newOwner) {
+      return res.status(404).json({ message: "New owner not found" });
+    }
+
+    const workspace = await Workspace.findOneAndUpdate(
+      { _id: id, owner: req.userId },
+      { owner: newOwner._id },
+      { new: true }
+    );
+
+    if (!workspace) {
+      return res
+        .status(404)
+        .json({ message: "Workspace not found or unauthorized" });
+    }
+
+    return res.json({ message: "Ownership transferred", workspace });
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ message: "Error transferring workspace", error: err.message });
   }
 };
 
@@ -493,5 +561,77 @@ export const getWorkspaceStats = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const deleteWorkspace = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  try {
+    const { workspaceId } = req.params;
+
+    // Find and delete the workspace
+    const workspace = await Workspace.findOneAndDelete(
+      { _id: workspaceId },
+      { session }
+    );
+
+    if (!workspace) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(404).json({ message: "Workspace not found" });
+    }
+
+    // Find all projects in this workspace
+    const projects = await Project.find({ workspace: workspaceId }, null, {
+      session,
+    });
+
+    // Collect all task IDs under these projects
+    const taskIds = await Task.find(
+      { project: { $in: projects.map((p) => p._id) } },
+      "_id",
+      { session }
+    ).then((tasks) => tasks.map((t) => t._id));
+
+    // Delete tasks
+    await Task.deleteMany({ _id: { $in: taskIds } }, { session });
+
+    // Delete comments associated with tasks
+    await Comment.deleteMany({ task: { $in: taskIds } }, { session });
+
+    // Delete projects
+    await Project.deleteMany({ workspace: workspaceId }, { session });
+
+    // Delete activity logs for workspace, projects, tasks, comments
+    await ActivityLog.deleteMany(
+      {
+        $or: [
+          { resourseType: "Workspace", resourseId: workspaceId },
+          {
+            resourseType: "Project",
+            resourseId: { $in: projects.map((p) => p._id) },
+          },
+          { resourseType: "Task", resourseId: { $in: taskIds } },
+          { resourseType: "Comment", resourseId: { $in: taskIds } }, 
+        ],
+      },
+      { session }
+    );
+
+    // Delete workspace invites
+    await WorkspaceInvite.deleteMany({ workspaceId }, { session });
+
+    // Commit transaction
+    await session.commitTransaction();
+    session.endSession();
+
+    return res.json({ message: "Workspace and all associated data deleted" });
+  } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
+    return res
+      .status(500)
+      .json({ message: "Error deleting workspace", error: err.message });
   }
 };

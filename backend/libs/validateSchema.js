@@ -106,3 +106,7 @@ export const inviteMemberSchema = z.object({
   email: z.string().email("Invalid email address"),
   role: z.enum(["admin", "member", "viewer"]),
 });
+
+export const transferWorkspaceSchema = z.object({
+  newOwnerEmail: z.string().email("Valid email required"),
+});
