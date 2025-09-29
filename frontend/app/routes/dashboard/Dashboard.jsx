@@ -8,10 +8,13 @@ import StatsCard from "@/components/dashboard/StatsCard";
 import UpcomingTasks from "@/components/dashboard/UpcomingTasks";
 import Loader from "@/components/Loader";
 import { useGetWorkspaceStatusQuery } from "@/hooks/useWorkspace";
+import { useWorkspace } from "@/lib/provider/workspaceContext";
 
 const Dashboard = () => {
   const [searchParams] = useSearchParams();
-  const workspaceId = searchParams.get("workspaceId");
+  // const workspaceId = searchParams.get("workspaceId");
+  const { selectedWorkspace } = useWorkspace();
+  const workspaceId = selectedWorkspace?._id || searchParams.get("workspaceId");
 
   const { data, isPending } = useGetWorkspaceStatusQuery(workspaceId);
 
