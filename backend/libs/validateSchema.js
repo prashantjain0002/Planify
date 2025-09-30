@@ -70,12 +70,12 @@ export const projectSchema = z.object({
   ]),
   startDate: z.string(),
   dueDate: z.string().optional(),
-  tags: z.string().optional(),
+  tags: z.array(z.string()).optional(),
   members: z
     .array(
       z.object({
         user: z.string(),
-        role: z.enum(["manager", "contributor", "viewer"]),
+        role: z.enum(["admin", "contributor", "viewer"]),
       })
     )
     .optional(),

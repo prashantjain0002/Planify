@@ -6,7 +6,13 @@ import {
   parmsWorkspaceIdSchema,
   projectSchema,
 } from "../libs/validateSchema.js";
-import { createProject, getProjectDetails, getProjectTasks } from "../controllers/project.controller.js";
+import {
+  createProject,
+  deleteProject,
+  getProjectDetails,
+  getProjectTasks,
+  updateProject,
+} from "../controllers/project.controller.js";
 
 const router = express.Router();
 
@@ -18,6 +24,16 @@ router.post(
     body: projectSchema,
   }),
   createProject
+);
+
+router.put(
+  "/:workspaceId/update-project/:projectId",
+  authMiddleware,
+  validateRequest({
+    params: parmsWorkspaceIdSchema.merge(parmsProjectIdSchema),
+    body: projectSchema.partial(),
+  }),
+  updateProject
 );
 
 router.get(
@@ -36,6 +52,15 @@ router.get(
     params: parmsProjectIdSchema,
   }),
   getProjectTasks
+);
+
+router.delete(
+  "/:workspaceId/delete-project/:projectId",
+  authMiddleware,
+  validateRequest({
+    params: parmsWorkspaceIdSchema.merge(parmsProjectIdSchema),
+  }),
+  deleteProject
 );
 
 export default router;

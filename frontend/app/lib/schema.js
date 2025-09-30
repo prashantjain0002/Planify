@@ -61,7 +61,7 @@ export const projectSchema = z.object({
     .array(
       z.object({
         user: z.string(),
-        role: z.enum(["manager", "contributor", "viewer"]),
+        role: z.enum(["admin", "contributor", "viewer"]),
       })
     )
     .optional(),

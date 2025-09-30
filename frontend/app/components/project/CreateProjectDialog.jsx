@@ -462,8 +462,16 @@ const CreateProjectDialog = ({
   const onSubmit = (data) => {
     if (!workspaceId) return;
 
+    // Convert tags string to array if user typed comma-separated values
+    const tagsArray = Array.isArray(data.tags)
+      ? data.tags
+      : data.tags
+          ?.split(",")
+          .map((t) => t.trim())
+          .filter(Boolean);
+
     mutate(
-      { projectData: data, workspaceId },
+      { projectData: { ...data, tags: tagsArray }, workspaceId },
       {
         onSuccess: () => {
           toast.success("Project created successfully");
@@ -680,8 +688,8 @@ const CreateProjectDialog = ({
                                         <SelectValue placeholder="Select Role" />
                                       </SelectTrigger>
                                       <SelectContent>
-                                        <SelectItem value="manager">
-                                          Manager
+                                        <SelectItem value="admin">
+                                          Admin
                                         </SelectItem>
                                         <SelectItem value="contributor">
                                           Contributor

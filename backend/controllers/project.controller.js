@@ -22,7 +22,7 @@ export const createProject = async (req, res) => {
         .json({ message: "You are not a member of this workspace" });
     }
 
-    const tagArray = tags ? tags.split(",") : [];
+    const tagArray = Array.isArray(tags) ? tags : tags ? tags.split(",") : [];
     const newProject = await Project.create({
       title,
       description,
@@ -41,6 +41,51 @@ export const createProject = async (req, res) => {
     res.status(201).json(newProject);
   } catch (error) {
     console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const updateProject = async (req, res) => {
+  try {
+    const { workspaceId, projectId } = req.params;
+    const { title, description, status, startDate, dueDate, tags, members } =
+      req.body;
+
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ message: "Project not found" });
+    }
+
+    if (project.workspace.toString() !== workspaceId) {
+      return res.status(400).json({ message: "Invalid workspace for project" });
+    }
+
+    const isMember = project.members.some(
+      (member) => member.user.toString() === req.user._id.toString()
+    );
+    if (!isMember) {
+      return res
+        .status(403)
+        .json({ message: "You are not a member of this project" });
+    }
+
+    if (title !== undefined) project.title = title;
+    if (description !== undefined) project.description = description;
+    if (status !== undefined) project.status = status;
+    if (startDate !== undefined) project.startDate = startDate;
+    if (dueDate !== undefined) project.dueDate = dueDate;
+    if (Array.isArray(tags)) {
+      project.tags = tags;
+    }
+    if (Array.isArray(members)) {
+      project.members = members;
+    }
+
+    await project.save();
+
+    res.status(200).json(project);
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -92,6 +137,49 @@ export const getProjectTasks = async (req, res) => {
       .sort({ createdAt: -1 });
 
     res.status(200).json({ project, tasks });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const deleteProject = async (req, res) => {
+  try {
+    const { workspaceId, projectId } = req.params;
+
+    const workspace = await Workspace.findById(workspaceId);
+    if (!workspace) {
+      return res.status(404).json({ message: "Workspace not found" });
+    }
+
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ message: "Project not found" });
+    }
+
+    if (project.workspace.toString() !== workspaceId) {
+      return res.status(400).json({ message: "Invalid workspace for project" });
+    }
+
+    const isMember = project.members.some(
+      (member) => member.user.toString() === req.user._id.toString()
+    );
+    if (!isMember) {
+      return res
+        .status(403)
+        .json({ message: "You are not a member of this project" });
+    }
+
+    await Task.deleteMany({ project: projectId });
+
+    workspace.projects = workspace.projects.filter(
+      (id) => id.toString() !== projectId
+    );
+    await workspace.save();
+
+    await project.deleteOne();
+
+    res.status(200).json({ message: "Project deleted successfully" });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Internal server error" });

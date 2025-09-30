@@ -188,29 +188,17 @@
 
 import Loader from "@/components/Loader";
 import CreateTaskDialog from "@/components/task/CreateTaskDialog";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useProjectQuery } from "@/hooks/useProject";
-import { getProjectProgress } from "@/lib";
-import { cn } from "@/lib/utils";
-import { format } from "date-fns";
 import {
-  AlertCircle,
-  Calendar,
-  CheckCircle,
-  Clock,
-  Edit2,
-  Trash2,
-  Tag,
-  User,
-  AlertCircleIcon,
-  Trash2Icon,
-  TagIcon,
-} from "lucide-react";
+  useDeleteProject,
+  useProjectQuery,
+  useUpdateProject,
+} from "@/hooks/useProject";
+import { getProjectProgress } from "@/lib";
+import { format } from "date-fns";
+import { Calendar, Edit2, TagIcon, Trash2, User } from "lucide-react";
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { motion } from "framer-motion";
@@ -224,10 +212,12 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import EditProjectDialog from "@/components/project/EditProjectDialog";
-// import {
-//   useDeleteProjectMutation,
-//   useUpdateProjectMutation,
-// } from "@/hooks/useProjectMutations"; // hypothetical hooks
+// import ProjectProgress from "@/components/project/ProjectProgress";
+// import ProjectMeta from "@/components/project/ProjectMeta";
+// import ProjectTags from "@/components/project/ProjectTags";
+// import TaskColumn from "@/components/task/TaskColumn";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 const ProjectDetails = () => {
   const [isCreateTask, setIsCreateTask] = useState(false);
@@ -239,13 +229,12 @@ const ProjectDetails = () => {
   const navigate = useNavigate();
 
   const { data, isLoading } = useProjectQuery(projectId);
-  const { data: workspace, isLoading: isWorkspaceLoading } =
-    useGetWorkspaceQuery(workspaceId);
+  const { data: workspace } = useGetWorkspaceQuery(workspaceId);
 
-  // const { mutate: deleteProject } = useDeleteProjectMutation(() =>
-  //   navigate(-1)
-  // );
-  // const { mutate: updateProject } = useUpdateProjectMutation(projectId);
+  const { mutate: deleteProject, isLoading: isDeleting } = useDeleteProject(
+    () => navigate(`/workspace/${workspaceId}`)
+  );
+  const { mutate: updateProject, isLoading: isUpdating } = useUpdateProject();
 
   if (isLoading) return <Loader />;
 
@@ -257,21 +246,44 @@ const ProjectDetails = () => {
   };
 
   const handleDeleteProject = () => {
-    // deleteProject(projectId);
+    deleteProject(
+      { workspaceId, projectId },
+      {
+        onSuccess: () => {
+          toast.success("Project deleted successfully");
+          navigate(`/workspaces/${workspaceId}`);
+        },
+        onError: (error) => {
+          const errorMessage = error?.message;
+          toast.error(errorMessage);
+        },
+      }
+    );
+    setDeleteOpen(false);
   };
 
-  const handleEditProject = () => {
-    // updateProject({
-    //   title: projectTitle,
-    //   description: projectDescription,
-    //   status: projectStatus,
-    //   tags: projectTags,
-    //   dueDate: projectDueDate,
-    // });
-    // setEditOpen(false);
+  const handleEditProject = (values) => {
+    updateProject(
+      {
+        workspaceId,
+        projectId,
+        projectData: {
+          ...values,
+          tags: values.tags || [],
+        },
+      },
+      {
+        onSuccess: () => {
+          toast.success("Project updated successfully");
+        },
+        onError: (error) => {
+          const errorMessage = error?.message;
+          toast.error(errorMessage);
+        },
+      }
+    );
+    setEditOpen(false);
   };
-
-  console.log(project);
 
   return (
     <motion.div
@@ -424,7 +436,6 @@ const ProjectDetails = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
-        {/* Header */}
         <div className="flex items-center gap-3 mb-2">
           <div className="flex items-center justify-center w-10 h-10 rounded-full bg-red-100">
             <Trash2 className="h-6 w-6 text-red-600" />
@@ -432,29 +443,26 @@ const ProjectDetails = () => {
           <h2 className="text-2xl font-semibold text-red-600">Danger Zone</h2>
         </div>
 
-        {/* Description */}
         <p className="text-gray-700 text-sm">
-          Deleting your workspace is permanent and cannot be undone.
+          Deleting your project is permanent and cannot be undone.
         </p>
 
-        {/* Delete Button */}
         <Button
           variant="destructive"
           className="py-3 font-medium transition-transform"
           onClick={() => setDeleteOpen(true)}
-          disabled={isLoading}
+          disabled={isDeleting}
         >
-          {isLoading ? "Deleting..." : "Delete Project"}
+          {isDeleting ? "Deleting..." : "Delete Project"}
         </Button>
 
-        {/* Confirmation Dialog */}
         <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
           <DialogContent className="max-w-md rounded-xl">
             <DialogHeader>
               <DialogTitle>Confirm Deletion</DialogTitle>
               <DialogDescription>
-                Are you sure you want to delete this workspace? This action
-                cannot be undone.
+                Are you sure you want to delete this project? This action cannot
+                be undone.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter className="flex justify-end gap-2">
@@ -464,9 +472,9 @@ const ProjectDetails = () => {
               <Button
                 variant="destructive"
                 onClick={handleDeleteProject}
-                disabled={isLoading}
+                disabled={isDeleting}
               >
-                {isLoading ? "Deleting..." : "Delete"}
+                {isDeleting ? "Deleting..." : "Delete"}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -486,9 +494,8 @@ const ProjectDetails = () => {
         editOpen={editOpen}
         setEditOpen={setEditOpen}
         project={project}
-        onSubmit={(values) => {
-          updateProject({ ...values });
-        }}
+        onSubmit={handleEditProject}
+        isLoading={isUpdating}
       />
     </motion.div>
   );
@@ -793,7 +800,7 @@ export const ProjectTags = ({ tags }) => {
           whileHover={{ scale: 1.1, y: -2 }}
         >
           <Badge className="px-3 py-1 rounded-full text-sm font-medium cursor-pointer shadow-md bg-[#2b079a] text-white">
-            <TagIcon className="h-4 w-4 mr-1"/> {tag}
+            <TagIcon className="h-4 w-4 mr-1" /> {tag}
           </Badge>
         </motion.div>
       ))}
