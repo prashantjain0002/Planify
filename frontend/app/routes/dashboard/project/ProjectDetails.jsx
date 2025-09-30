@@ -1,191 +1,3 @@
-// import Loader from "@/components/Loader";
-// import CreateTaskDialog from "@/components/task/CreateTaskDialog";
-// import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-// import { Badge } from "@/components/ui/badge";
-// import { Button } from "@/components/ui/button";
-// import { Card, CardContent, CardHeader } from "@/components/ui/card";
-// import { Progress } from "@/components/ui/progress";
-// import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-// import { useProjectQuery } from "@/hooks/useProject";
-// import { getProjectProgress } from "@/lib";
-// import { cn } from "@/lib/utils";
-// import { format } from "date-fns";
-// import { AlertCircle, Calendar, CheckCircle, Clock } from "lucide-react";
-// import React, { useState } from "react";
-// import { useNavigate, useParams } from "react-router";
-// import { motion } from "framer-motion";
-// import { useGetWorkspaceQuery } from "@/hooks/useWorkspace";
-
-// const ProjectDetails = () => {
-//   const [isCreateTask, setIsCreateTask] = useState(false);
-//   const [taskFilters, setTaskFilters] = useState({});
-//   const { projectId, workspaceId } = useParams();
-
-//   const { data, isLoading } = useProjectQuery(projectId);
-//   const { data: workspace, isLoading: isWorkspaceLoading } =
-//     useGetWorkspaceQuery(workspaceId);
-
-//   const navigate = useNavigate();
-
-//   if (isLoading) return <Loader />;
-
-//   const { project, tasks } = data;
-//   const projectProgress = getProjectProgress(tasks);
-
-//   const handleTaskClick = (taskId) => {
-//     navigate(`/workspace/${workspaceId}/projects/${projectId}/tasks/${taskId}`);
-//   };
-
-//   return (
-//     <motion.div
-//       className="space-y-8"
-//       initial={{ opacity: 0, y: 20 }}
-//       animate={{ opacity: 1, y: 0 }}
-//       transition={{ duration: 0.6 }}
-//     >
-//       {/* Header */}
-//       <motion.div
-//         className="flex flex-col md:flex-row md:items-center justify-between gap-4"
-//         initial={{ opacity: 0, y: -20 }}
-//         animate={{ opacity: 1, y: 0 }}
-//         transition={{ duration: 0.5 }}
-//       >
-//         <div>
-//           <Button
-//             onClick={() => navigate(-1)}
-//             variant={"outline"}
-//             size={"sm"}
-//             className={"p-4 me-4"}
-//           >
-//             ← Back
-//           </Button>
-
-//           <div className="flex items-center gap-3 mt-4">
-//             <h1 className="text-xl md:text-2xl font-bold">{project.title}</h1>
-//           </div>
-
-//           {project.description && (
-//             <p className="text-gray-500 text-sm">{project.description}</p>
-//           )}
-//         </div>
-
-//         <div className="flex flex-col sm:flex-row gap-3">
-//           <div className="flex items-center gap-2 min-w-32">
-//             <div className="text-sm text-muted-foreground">Progress</div>
-//             <div className="flex-1">
-//               <Progress value={projectProgress} className="h-2" />
-//             </div>
-//             <span className="text-sm text-muted-foreground">
-//               {projectProgress} %
-//             </span>
-//           </div>
-
-//           <Button
-//             onClick={() => setIsCreateTask(true)}
-//             className="transition-transform hover:scale-105"
-//           >
-//             Add Task
-//           </Button>
-//         </div>
-//       </motion.div>
-
-//       {/* Tabs */}
-//       <Tabs defaultValue="all" className={"w-full"}>
-//         <motion.div
-//           className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6"
-//           initial={{ opacity: 0, y: -10 }}
-//           animate={{ opacity: 1, y: 0 }}
-//           transition={{ duration: 0.5 }}
-//         >
-//           <TabsList>
-//             {["all", "todo", "in-progress", "done"].map((val) => (
-//               <TabsTrigger
-//                 key={val}
-//                 value={val}
-//                 onClick={() =>
-//                   setTaskFilters(
-//                     val === "all"
-//                       ? "All"
-//                       : val === "todo"
-//                         ? "To Do"
-//                         : val === "in-progress"
-//                           ? "In Progress"
-//                           : "Done"
-//                   )
-//                 }
-//               >
-//                 {val.replace("-", " ").replace(/\b\w/g, (c) => c.toUpperCase())}
-//               </TabsTrigger>
-//             ))}
-//           </TabsList>
-
-//           <div className="flex items-center text-sm">
-//             <span className="text-muted-foreground mr-2">Status</span>
-//             <div className="flex flex-row gap-2">
-//               <Badge className="bg-background" variant={"outline"}>
-//                 {tasks.filter((task) => task.status === "To Do").length} To Do
-//               </Badge>
-//               <Badge className="bg-background" variant={"outline"}>
-//                 {tasks.filter((task) => task.status === "In Progress").length}{" "}
-//                 In Progress
-//               </Badge>
-//               <Badge className="bg-background" variant={"outline"}>
-//                 {tasks.filter((task) => task.status === "Done").length} Done
-//               </Badge>
-//             </div>
-//           </div>
-//         </motion.div>
-
-//         {/* Task Columns */}
-//         {["all", "todo", "in-progress", "done"].map((tab) => (
-//           <TabsContent key={tab} value={tab} className={"m-0"}>
-//             <motion.div
-//               className={
-//                 tab === "all"
-//                   ? "grid grid-cols-3 gap-4"
-//                   : "grid md:grid-cols-1 gap-4"
-//               }
-//               initial={{ opacity: 0, y: 10 }}
-//               animate={{ opacity: 1, y: 0 }}
-//               transition={{ duration: 0.5 }}
-//             >
-//               <TaskColumn
-//                 title="To Do"
-//                 tasks={tasks.filter((t) => t.status === "To Do")}
-//                 onTaskClick={handleTaskClick}
-//                 isFullWidth={tab !== "all"}
-//               />
-//               {tab === "all" && (
-//                 <>
-//                   <TaskColumn
-//                     title="In Progress"
-//                     tasks={tasks.filter((t) => t.status === "In Progress")}
-//                     onTaskClick={handleTaskClick}
-//                   />
-//                   <TaskColumn
-//                     title="Done"
-//                     tasks={tasks.filter((t) => t.status === "Done")}
-//                     onTaskClick={handleTaskClick}
-//                   />
-//                 </>
-//               )}
-//             </motion.div>
-//           </TabsContent>
-//         ))}
-//       </Tabs>
-
-//       <CreateTaskDialog
-//         open={isCreateTask}
-//         onOpenChange={setIsCreateTask}
-//         projectId={projectId}
-//         projectMembers={workspace?.workspace?.members}
-//       />
-//     </motion.div>
-//   );
-// };
-
-// export default ProjectDetails;
-
 import Loader from "@/components/Loader";
 import CreateTaskDialog from "@/components/task/CreateTaskDialog";
 import { Button } from "@/components/ui/button";
@@ -198,7 +10,16 @@ import {
 } from "@/hooks/useProject";
 import { getProjectProgress } from "@/lib";
 import { format } from "date-fns";
-import { Calendar, Edit2, TagIcon, Trash2, User } from "lucide-react";
+import {
+  AlertCircle,
+  Calendar,
+  CheckCircle,
+  Clock,
+  Edit2,
+  TagIcon,
+  Trash2,
+  User,
+} from "lucide-react";
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { motion } from "framer-motion";
@@ -212,12 +33,10 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import EditProjectDialog from "@/components/project/EditProjectDialog";
-// import ProjectProgress from "@/components/project/ProjectProgress";
-// import ProjectMeta from "@/components/project/ProjectMeta";
-// import ProjectTags from "@/components/project/ProjectTags";
-// import TaskColumn from "@/components/task/TaskColumn";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const ProjectDetails = () => {
   const [isCreateTask, setIsCreateTask] = useState(false);
@@ -335,10 +154,9 @@ const ProjectDetails = () => {
                 {project.description}
               </p>
             )}
-            {/* Progress */}
+
             <ProjectProgress projectProgress={projectProgress} />
 
-            {/* Metadata */}
             <ProjectMeta project={project} />
 
             <ProjectTags tags={project?.tags} />
@@ -481,7 +299,6 @@ const ProjectDetails = () => {
         </Dialog>
       </motion.div>
 
-      {/* Create Task Dialog */}
       <CreateTaskDialog
         open={isCreateTask}
         onOpenChange={setIsCreateTask}
@@ -489,7 +306,6 @@ const ProjectDetails = () => {
         projectMembers={workspace?.workspace?.members}
       />
 
-      {/* Edit Project Dialog */}
       <EditProjectDialog
         editOpen={editOpen}
         setEditOpen={setEditOpen}
