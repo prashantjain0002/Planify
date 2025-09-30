@@ -95,7 +95,7 @@ const Profile = () => {
 
         setTimeout(() => {
           logout();
-          navigate("/sign-in");
+          navigate("/");
         }, 2000);
       },
       onError: (error) => {

@@ -38,7 +38,7 @@ const DashBoardLayout = () => {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/sign-in" />;
+    return <Navigate to="/" />;
   }
   return (
     <div className="flex h-screen w-full">

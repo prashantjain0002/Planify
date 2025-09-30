@@ -1,8 +1,8 @@
 import { index, layout, route } from "@react-router/dev/routes";
 
 export default [
+  index("routes/home/Home.jsx"),
   layout("routes/auth/AuthLayout.jsx", [
-    index("routes/root/Home.jsx"),
     route("sign-in", "routes/auth/SignIn.jsx"),
     route("sign-up", "routes/auth/SignUp.jsx"),
     route("forgot-password", "routes/auth/ForgotPassword.jsx"),

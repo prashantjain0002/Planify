@@ -46,7 +46,7 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setIsAuthenticated(false);
     queryClient.clear();
-    navigate("/sign-in", { replace: true });
+    window.location.replace("/");
   };
 
   if (isLoading) {
