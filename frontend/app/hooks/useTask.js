@@ -1,4 +1,4 @@
-import { getData, postData, updateData } from "@/lib/fetchUtil";
+import { deleteData, getData, postData, updateData } from "@/lib/fetchUtil";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useCreateTask = () => {
@@ -210,6 +210,21 @@ export const useUpdateSubTaskMutatuion = () => {
       });
       queryClient.invalidateQueries({
         queryKey: ["task-activity", data._id],
+      });
+    },
+  });
+};
+
+export const useDeleteTask = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ projectId, taskId }) => {
+      return await deleteData(`/tasks/${taskId}`);
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["project", variables.projectId],
       });
     },
   });

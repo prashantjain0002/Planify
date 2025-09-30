@@ -605,3 +605,31 @@ export const updateSubTask = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+export const deleteTask = async (req, res) => {
+  try {
+    const { taskId } = req.params;
+
+    const task = await Task.findById(taskId);
+    if (!task) return res.status(404).json({ message: "Task not found" });
+
+    const project = await Project.findById(task.project);
+    const isMember = project.members.some(
+      (m) => m.user.toString() === req.user._id.toString()
+    );
+    if (!isMember)
+      return res
+        .status(403)
+        .json({ message: "You are not a member of this project" });
+
+    await Task.findByIdAndDelete(taskId);
+
+    project.tasks = project.tasks.filter((id) => id.toString() !== taskId);
+    await project.save();
+
+    res.status(200).json({ message: "Task deleted successfully" });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};

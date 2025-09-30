@@ -21,6 +21,7 @@ import {
   addSubTask,
   archiveTask,
   createTask,
+  deleteTask,
   getActivityByResourceId,
   getArchivedTasks,
   getCommentByTaskId,
@@ -176,5 +177,7 @@ router.get(
 );
 
 router.get("/:workspaceId/archived-tasks", authMiddleware, getArchivedTasks);
+
+router.delete("/:taskId", authMiddleware, deleteTask);
 
 export default router;
