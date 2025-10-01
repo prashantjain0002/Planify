@@ -18,6 +18,7 @@ import { motion } from "framer-motion";
 import { useGetWorkspaceDetailsQuery } from "@/hooks/useWorkspace";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useWorkspace } from "@/lib/provider/workspaceContext";
+import NoDataFound from "@/components/NoDataFound";
 
 const Members = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -27,7 +28,14 @@ const Members = () => {
   const { selectedWorkspace } = useWorkspace();
   const workspaceId = selectedWorkspace?._id || searchParams.get("workspaceId");
 
-  console.log(workspaceId);
+  if (!workspaceId) {
+    return (
+      <NoDataFound
+        title={"No members found"}
+        description={"Please select a workspace to view members"}
+      />
+    );
+  }
 
   const { data, isLoading } = useGetWorkspaceDetailsQuery(workspaceId || "0");
 

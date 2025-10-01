@@ -32,6 +32,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router";
 import { motion } from "framer-motion";
+import NoDataFound from "@/components/NoDataFound";
 
 const MyTasks = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -68,6 +69,15 @@ const MyTasks = () => {
       setSortDirection(urlSort === "asc" ? "asc" : "desc");
     if (urlSearch !== search) setSearch(urlSearch);
   }, [searchParams]);
+
+  if (!data || data.length === 0) {
+    return (
+      <NoDataFound
+        title={"No tasks found"}
+        description={"Try adjusting your filters or adding a new task."}
+      />
+    );
+  }
 
   // Filter tasks
   const filteredTasks =
@@ -306,13 +316,12 @@ const MyTasks = () => {
                 ))}
 
                 {sortedTasks.length === 0 && (
-                  <div className="flex flex-col items-center justify-center py-20 text-center text-gray-400 dark:text-gray-500">
-                    <Inbox className="w-16 h-16 mb-4 text-gray-300 dark:text-gray-500" />
-                    <h2 className="text-lg font-semibold">No tasks found</h2>
-                    <p className="text-sm text-gray-400 dark:text-gray-500">
-                      Try adjusting your filters or adding a new task.
-                    </p>
-                  </div>
+                  <NoDataFound
+                    title={"No tasks found"}
+                    description={
+                      "Try adjusting your filters or adding a new task."
+                    }
+                  />
                 )}
               </div>
             </CardContent>
@@ -322,13 +331,10 @@ const MyTasks = () => {
         {/* Grid View */}
         <TabsContent value="grid" className="mb-4">
           {sortedTasks.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-center text-gray-400 dark:text-gray-500">
-              <Inbox className="w-16 h-16 mb-4 text-gray-300 dark:text-gray-500" />
-              <h2 className="text-lg font-semibold">No tasks found</h2>
-              <p className="text-sm text-gray-400 dark:text-gray-500">
-                Try adjusting your filters or adding a new task.
-              </p>
-            </div>
+            <NoDataFound
+              title={"No tasks found"}
+              description={"Try adjusting your filters or adding a new task."}
+            />
           ) : (
             <motion.div
               className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
@@ -431,9 +437,7 @@ const MyTasks = () => {
 
                     <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 text-xs w-fit mx-auto text-center">
                       <Clock className="size-4" />
-                      <span>
-                         {format(new Date(task.updatedAt), "PPPP")}
-                      </span>
+                      <span>{format(new Date(task.updatedAt), "PPPP")}</span>
                     </div>
                   </CardContent>
                 </motion.div>

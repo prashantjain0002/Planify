@@ -33,6 +33,7 @@ import {
 import { useWorkspace } from "@/lib/provider/workspaceContext";
 import { toast } from "sonner";
 import Loader from "@/components/Loader";
+import NoDataFound from "@/components/NoDataFound";
 
 export const colorOptions = [
   "#FF5733",
@@ -51,6 +52,15 @@ const WorkspaceSettings = () => {
   const workspaceId = selectedWorkspace?._id || searchParams.get("workspaceId");
   const navigate = useNavigate();
   const [deleteOpen, setDeleteOpen] = useState(false);
+
+  if (!workspaceId) {
+    return (
+      <NoDataFound
+        title={"No Workspace Selected"}
+        description={"Please select or create a workspace to manage settings."}
+      />
+    );
+  }
 
   const { data: workspace, isPending } =
     useGetWorkspaceDetailsQuery(workspaceId);

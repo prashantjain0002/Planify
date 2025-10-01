@@ -15,6 +15,7 @@ import { useAuth } from "@/lib/provider/authContext";
 import { useWorkspace } from "@/lib/provider/workspaceContext";
 import { ArchiveRestore, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
+import NoDataFound from "@/components/NoDataFound";
 
 const statusColors = {
   "In Progress": "bg-yellow-100 text-yellow-800",
@@ -38,9 +39,10 @@ const ArchivedTasks = () => {
   if (isLoading) return <Loader />;
   if (!data)
     return (
-      <div className="text-center text-muted-foreground mt-12">
-        No workspace found
-      </div>
+       <NoDataFound
+        title={"No archived tasks found"}
+        description={"You don't have any archived tasks"}
+      />
     );
 
   const { workspace, tasks } = data;

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useSearchParams } from "react-router";
 import { motion } from "framer-motion";
 
@@ -9,14 +9,36 @@ import UpcomingTasks from "@/components/dashboard/UpcomingTasks";
 import Loader from "@/components/Loader";
 import { useGetWorkspaceStatusQuery } from "@/hooks/useWorkspace";
 import { useWorkspace } from "@/lib/provider/workspaceContext";
+import NoDataFound from "@/components/NoDataFound";
+import CreateWorkspace from "@/components/workspace/CreateWorkspace";
 
 const Dashboard = () => {
+  const [isCreatingWorkspace, setIsCreatingWorkspace] = useState(false);
   const [searchParams] = useSearchParams();
-  // const workspaceId = searchParams.get("workspaceId");
   const { selectedWorkspace } = useWorkspace();
   const workspaceId = selectedWorkspace?._id || searchParams.get("workspaceId");
 
-  const { data, isPending } = useGetWorkspaceStatusQuery(workspaceId);
+  const { data, isPending } = useGetWorkspaceStatusQuery(workspaceId, {
+    enabled: !!workspaceId,
+  });
+
+  if (!workspaceId) {
+    return (
+      <>
+        <NoDataFound
+          title={"No workspace found"}
+          description={"Create a workspace to get started"}
+          buttonText={"Create Workspace"}
+          buttonAction={() => setIsCreatingWorkspace(true)}
+        />
+
+        <CreateWorkspace
+          isCreatingWorkspace={isCreatingWorkspace}
+          setIsCreatingWorkspace={setIsCreatingWorkspace}
+        />
+      </>
+    );
+  }
 
   if (isPending) return <Loader />;
 
@@ -28,7 +50,7 @@ const Dashboard = () => {
   return (
     <motion.div
       className="space-y-8 2xl:space-y-12 px-6"
-      style={{ scrollbarWidth: "none" }} // Firefox
+      style={{ scrollbarWidth: "none" }}
     >
       {/* Dashboard Header */}
       <motion.div
@@ -48,7 +70,7 @@ const Dashboard = () => {
         viewport={{ once: true, amount: 0.3 }}
         variants={sectionVariants}
       >
-        <StatsCard data={data.stats} />
+        <StatsCard data={data?.stats} />
       </motion.div>
 
       {/* Statistics Charts */}
@@ -59,11 +81,11 @@ const Dashboard = () => {
         variants={sectionVariants}
       >
         <StatisticsCharts
-          stats={data.stats}
-          taskTrendsData={data.taskTrendsData}
-          projectStatusData={data.projectStatusData}
-          taskPriorityData={data.taskPriorityData}
-          workspaceProductivityData={data.workspaceProductivityData}
+          stats={data?.stats}
+          taskTrendsData={data?.taskTrendsData}
+          projectStatusData={data?.projectStatusData}
+          taskPriorityData={data?.taskPriorityData}
+          workspaceProductivityData={data?.workspaceProductivityData}
         />
       </motion.div>
 
@@ -76,10 +98,10 @@ const Dashboard = () => {
         variants={sectionVariants}
       >
         <motion.div className="flex-1" variants={sectionVariants}>
-          <RecentProjects data={data.recentProjects} />
+          <RecentProjects data={data?.recentProjects} />
         </motion.div>
         <motion.div className="flex-1" variants={sectionVariants}>
-          <UpcomingTasks data={data.upcomingTasks} />
+          <UpcomingTasks data={data?.upcomingTasks} />
         </motion.div>
       </motion.div>
     </motion.div>
