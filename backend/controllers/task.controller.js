@@ -16,18 +16,15 @@ export const createTask = async (req, res) => {
       return res.status(404).json({ message: "Project not found" });
     }
 
+    if (project.createdBy.toString() !== req.user._id.toString()) {
+      return res
+        .status(403)
+        .json({ message: "Only the project creator can create tasks" });
+    }
+
     const workspace = await Workspace.findById(project.workspace);
     if (!workspace) {
       return res.status(404).json({ message: "Workspace not found" });
-    }
-
-    const isMember = workspace.members.some(
-      (member) => member.user.toString() === req.user._id.toString()
-    );
-    if (!isMember) {
-      return res
-        .status(403)
-        .json({ message: "You are not a member of this workspace" });
     }
 
     const newTask = await Task.create({
@@ -46,53 +43,52 @@ export const createTask = async (req, res) => {
 
     res.status(201).json(newTask);
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
 
-export const addSubTask = async (req, res) => {
-  try {
-    const { taskId } = req.params;
-    const { title } = req.body;
+// export const addSubTask = async (req, res) => {
+//   try {
+//     const { taskId } = req.params;
+//     const { title } = req.body;
 
-    const task = await Task.findById(taskId);
-    if (!task) {
-      return res.status(404).json({ message: "Task not found" });
-    }
+//     const task = await Task.findById(taskId);
+//     if (!task) {
+//       return res.status(404).json({ message: "Task not found" });
+//     }
 
-    const project = await Project.findById(task.project);
-    if (!project) {
-      return res.status(404).json({ message: "Project not found" });
-    }
+//     const project = await Project.findById(task.project);
+//     if (!project) {
+//       return res.status(404).json({ message: "Project not found" });
+//     }
 
-    const isMember = project.members.some(
-      (member) => member.user.toString() === req.user._id.toString()
-    );
-    if (!isMember) {
-      return res
-        .status(403)
-        .json({ message: "You are not a member of this project" });
-    }
+//     if (project.createdBy.toString() !== req.user._id.toString()) {
+//       return res
+//         .status(403)
+//         .json({ message: "Only the project creator can add subtasks" });
+//     }
 
-    const newSubTask = {
-      title,
-      completed: false,
-    };
+//     const newSubTask = {
+//       title,
+//       completed: false,
+//     };
 
-    task.subtasks.push(newSubTask);
-    await task.save();
+//     task.subtasks.push(newSubTask);
+//     await task.save();
 
-    await recordActivity(req.user._id, "created_task", "Task", taskId, {
-      description: `Created subtask ${title}`,
-    });
+//     if (typeof recordActivity === "function") {
+//       await recordActivity(req.user._id, "created_subtask", "Task", taskId, {
+//         description: `Created subtask "${title}"`,
+//       });
+//     }
 
-    res.status(201).json(task);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-};
+//     res.status(201).json(task);
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).json({ message: "Internal server error" });
+//   }
+// };
 
 export const addComment = async (req, res) => {
   try {
@@ -384,27 +380,25 @@ export const updateTaskTitle = async (req, res) => {
       return res.status(404).json({ message: "Project not found" });
     }
 
-    const isMember = project.members.some(
-      (member) => member.user.toString() === req.user._id.toString()
-    );
-    if (!isMember) {
+    if (project.createdBy.toString() !== req.user._id.toString()) {
       return res
         .status(403)
-        .json({ message: "You are not a member of this workspace" });
+        .json({ message: "Only the project creator can update task title" });
     }
 
     const oldTitle = task.title;
-
     task.title = title;
     await task.save();
 
-    await recordActivity(req.user._id, "updated_task", "Task", taskId, {
-      description: `Updated task title from ${oldTitle} to ${title}`,
-    });
+    if (typeof recordActivity === "function") {
+      await recordActivity(req.user._id, "updated_task", "Task", taskId, {
+        description: `Updated task title from "${oldTitle}" to "${title}"`,
+      });
+    }
 
     res.status(200).json(task);
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -424,32 +418,31 @@ export const updateTaskDescription = async (req, res) => {
       return res.status(404).json({ message: "Project not found" });
     }
 
-    const isMember = project.members.some(
-      (member) => member.user.toString() === req.user._id.toString()
-    );
-    if (!isMember) {
-      return res
-        .status(403)
-        .json({ message: "You are not a member of this workspace" });
+    if (project.createdBy.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        message: "Only the project creator can update task description",
+      });
     }
 
     const oldDescription =
-      task.description.substring(0, 50) +
-      (task.description.length > 50 ? "..." : "");
-    const newDescription =
-      task.description.substring(0, 50) +
-      (task.description.length > 50 ? "..." : "");
+      task.description?.substring(0, 50) +
+      (task.description?.length > 50 ? "..." : "");
 
     task.description = description;
     await task.save();
 
-    await recordActivity(req.user._id, "updated_task", "Task", taskId, {
-      description: `Updated task description from ${oldDescription} to ${newDescription}`,
-    });
+    const newDescription =
+      description?.substring(0, 50) + (description?.length > 50 ? "..." : "");
+
+    if (typeof recordActivity === "function") {
+      await recordActivity(req.user._id, "updated_task", "Task", taskId, {
+        description: `Updated task description from "${oldDescription}" to "${newDescription}"`,
+      });
+    }
 
     res.status(200).json(task);
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -500,37 +493,41 @@ export const updateTaskAssignees = async (req, res) => {
     const { taskId } = req.params;
     const { assignees } = req.body;
 
+    // Find the task
     const task = await Task.findById(taskId);
     if (!task) {
       return res.status(404).json({ message: "Task not found" });
     }
 
+    // Find the project
     const project = await Project.findById(task.project);
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
     }
 
-    const isMember = project.members.some(
-      (member) => member.user.toString() === req.user._id.toString()
-    );
-    if (!isMember) {
-      return res
-        .status(403)
-        .json({ message: "You are not a member of this workspace" });
+    // Only the project creator can update assignees
+    if (project.createdBy.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        message: "Only the project creator can update task assignees",
+      });
     }
 
-    const oldAssignees = task.assignees;
+    const oldAssignees = task.assignees || [];
 
-    task.assignees = assignees;
+    task.assignees = assignees || [];
     await task.save();
 
-    await recordActivity(req.user._id, "updated_task", "Task", taskId, {
-      description: `Updated task assignees from ${oldAssignees.length} to ${assignees.length}`,
-    });
+    if (typeof recordActivity === "function") {
+      await recordActivity(req.user._id, "updated_task", "Task", taskId, {
+        description: `Updated task assignees from [${oldAssignees.join(
+          ", "
+        )}] to [${assignees.join(", ")}]`,
+      });
+    }
 
     res.status(200).json(task);
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -540,71 +537,88 @@ export const updateTaskPriority = async (req, res) => {
     const { taskId } = req.params;
     const { priority } = req.body;
 
+    // Find the task
     const task = await Task.findById(taskId);
     if (!task) {
       return res.status(404).json({ message: "Task not found" });
     }
 
+    // Find the project
     const project = await Project.findById(task.project);
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
     }
 
-    const isMember = project.members.some(
-      (member) => member.user.toString() === req.user._id.toString()
-    );
-    if (!isMember) {
+    // Only the project creator can update task priority
+    if (project.createdBy.toString() !== req.user._id.toString()) {
       return res
         .status(403)
-        .json({ message: "You are not a member of this workspace" });
+        .json({ message: "Only the project creator can update task priority" });
     }
 
     const oldPriority = task.priority;
 
+    // Update priority
     task.priority = priority;
     await task.save();
 
-    await recordActivity(req.user._id, "updated_task", "Task", taskId, {
-      description: `Updated task priority from ${oldPriority} to ${priority}`,
-    });
+    // Record activity
+    if (typeof recordActivity === "function") {
+      await recordActivity(req.user._id, "updated_task", "Task", taskId, {
+        description: `Updated task priority from ${oldPriority} to ${priority}`,
+      });
+    }
 
     res.status(200).json(task);
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
 
-export const updateSubTask = async (req, res) => {
-  try {
-    const { taskId, subTaskId } = req.params;
-    const { completed } = req.body;
+// export const updateSubTask = async (req, res) => {
+//   try {
+//     const { taskId, subTaskId } = req.params;
+//     const { completed } = req.body;
 
-    const task = await Task.findById(taskId);
-    if (!task) {
-      return res.status(404).json({ message: "Task not found" });
-    }
+//     const task = await Task.findById(taskId);
+//     if (!task) {
+//       return res.status(404).json({ message: "Task not found" });
+//     }
 
-    const subTask = task.subtasks.find(
-      (subTask) => subTask._id.toString() === subTaskId
-    );
-    if (!subTask) {
-      return res.status(404).json({ message: "Sub Task not found" });
-    }
+//     const project = await Project.findById(task.project);
+//     if (!project) {
+//       return res.status(404).json({ message: "Project not found" });
+//     }
 
-    subTask.completed = completed;
-    await task.save();
+//     if (project.createdBy.toString() !== req.user._id.toString()) {
+//       return res
+//         .status(403)
+//         .json({ message: "Only the project creator can update subtasks" });
+//     }
 
-    await recordActivity(req.user._id, "updated_subtask", "Task", taskId, {
-      description: `Updated subtask ${subTask.title}`,
-    });
+//     const subTask = task.subtasks.find(
+//       (subTask) => subTask._id.toString() === subTaskId
+//     );
+//     if (!subTask) {
+//       return res.status(404).json({ message: "Sub Task not found" });
+//     }
 
-    res.status(200).json(task);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-};
+//     subTask.completed = completed;
+//     await task.save();
+
+//     if (typeof recordActivity === "function") {
+//       await recordActivity(req.user._id, "updated_subtask", "Task", taskId, {
+//         description: `Updated subtask ${subTask.title}`,
+//       });
+//     }
+
+//     res.status(200).json(task);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: "Internal server error" });
+//   }
+// };
 
 export const deleteTask = async (req, res) => {
   try {
@@ -614,22 +628,22 @@ export const deleteTask = async (req, res) => {
     if (!task) return res.status(404).json({ message: "Task not found" });
 
     const project = await Project.findById(task.project);
-    const isMember = project.members.some(
-      (m) => m.user.toString() === req.user._id.toString()
-    );
-    if (!isMember)
+    if (!project) return res.status(404).json({ message: "Project not found" });
+
+    if (project.createdBy.toString() !== req.user._id.toString()) {
       return res
         .status(403)
-        .json({ message: "You are not a member of this project" });
-
-    await Task.findByIdAndDelete(taskId);
+        .json({ message: "Only the project creator can delete tasks" });
+    }
 
     project.tasks = project.tasks.filter((id) => id.toString() !== taskId);
     await project.save();
 
+    await Task.findByIdAndDelete(taskId);
+
     res.status(200).json({ message: "Task deleted successfully" });
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(500).json({ message: "Internal server error" });
   }
 };

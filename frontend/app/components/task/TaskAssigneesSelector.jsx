@@ -5,11 +5,17 @@ import { Button } from "../ui/button";
 import { useUpdateTaskAssigneesMutatuion } from "@/hooks/useTask";
 import { toast } from "sonner";
 
-const TaskAssigneesSelector = ({ task, assignees, projectMembers }) => {
+const TaskAssigneesSelector = ({
+  task,
+  assignees,
+  projectMembers,
+  isProjectCreator,
+}) => {
   const [selectedIds, setSelectedIds] = useState([]);
   const [dropDownOpen, setDropDownOpen] = useState(false);
   const { mutate, isPending } = useUpdateTaskAssigneesMutatuion();
 
+  // Normalize members for consistent shape
   const normalizedMembers = projectMembers.map((m) => {
     if (m.user) {
       return {
@@ -34,6 +40,8 @@ const TaskAssigneesSelector = ({ task, assignees, projectMembers }) => {
     );
 
   const handleSaveAssignees = () => {
+    if (!isProjectCreator) return;
+
     mutate(
       { taskId: task._id, assignees: selectedIds },
       {
@@ -41,9 +49,11 @@ const TaskAssigneesSelector = ({ task, assignees, projectMembers }) => {
           setDropDownOpen(false);
           toast.success("Assignees updated");
         },
-        onError: (e) => {
-          console.error(e);
-          toast.error(e?.message || "Failed");
+        onError: (error) => {
+          console.error(error);
+          toast.error(
+            error?.response?.data?.message || "Failed to update assignees"
+          );
         },
       }
     );
@@ -66,7 +76,7 @@ const TaskAssigneesSelector = ({ task, assignees, projectMembers }) => {
             .map((m) => (
               <div
                 key={m._id}
-                className="flex items-center gap-2 bg-white dark:bg-gray-700 border dark:border-gray-600 rounded-lg px-3 py-1 shadow-sm hover:shadow-md transition-shadow cursor-no-drop"
+                className="flex items-center gap-2 bg-white dark:bg-gray-700 border dark:border-gray-600 rounded-lg px-3 py-1 shadow-sm transition-shadow cursor-default"
               >
                 <Avatar className="w-6 h-6">
                   <AvatarImage src={m.profilePicture} />
@@ -79,18 +89,23 @@ const TaskAssigneesSelector = ({ task, assignees, projectMembers }) => {
             ))
         )}
       </div>
-
+      
       <div className="relative">
         <button
-          className="text-sm w-full border rounded px-3 py-2 text-left bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 font-semibold text-green-500 dark:text-green-400"
-          onClick={() => setDropDownOpen(!dropDownOpen)}
+          className={`text-sm w-full border rounded px-3 py-2 text-left font-semibold
+            ${
+              isProjectCreator
+                ? "bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-green-500 dark:text-green-400 hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer"
+                : "bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-400 cursor-not-allowed"
+            }`}
+          onClick={() => isProjectCreator && setDropDownOpen(!dropDownOpen)}
         >
           {selectedIds.length === 0
             ? "Select Assignees"
             : `${selectedIds.length} Selected`}
         </button>
 
-        {dropDownOpen && (
+        {isProjectCreator && dropDownOpen && (
           <div className="absolute top-full w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded z-10 mt-1 shadow-lg max-h-60 overflow-y-auto">
             <div className="flex justify-between px-2 py-1 border-b border-gray-200 dark:border-gray-600">
               <button

@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import Loader from "@/components/Loader";
-import SubTaskDetails from "@/components/task/SubTaskDetails";
+// import SubTaskDetails from "@/components/task/SubTaskDetails";
 import TaskActivity from "@/components/task/TaskActivity";
 import TaskAssigneesSelector from "@/components/task/TaskAssigneesSelector";
 import TaskDescription from "@/components/task/TaskDescription";
@@ -49,13 +49,13 @@ const TaskDetails = () => {
   const { data: taskData, isLoading } = useTaskByIdQuery(taskId);
   const { data: workspaceDetails, isLoading: isWorkspaceLoading } =
     useGetWorkspaceDetailsQuery(workspaceId);
-  const { data: workspaceProjects } = useGetWorkspaceQuery(workspaceId);
 
   const { mutate: watchTask, isPending: isWatching } = useWatchTask();
   const { mutate: archiveTask, isPending: isArchiving } = useArchiveTask();
   const { mutate: deleteTask, isLoading: isDeleting } = useDeleteTask();
 
   if (isLoading || isWorkspaceLoading) return <Loader />;
+
   if (!taskData)
     return (
       <div className="flex items-center justify-center h-screen">
@@ -69,7 +69,6 @@ const TaskDetails = () => {
   const workspaceMembers = workspaceDetails?.members || [];
   const projectMembers = project?.members || [];
 
-  // Merge project and workspace members without duplicates
   const allMembers = [...workspaceMembers, ...projectMembers].reduce(
     (acc, member) => {
       const exists = acc.find(
@@ -82,6 +81,9 @@ const TaskDetails = () => {
   );
 
   const isUserWatching = task?.watchers?.some((w) => w._id === user._id);
+
+  const isProjectCreator =
+    project?.createdBy.toString() === user._id.toString();
 
   const handleWatchTask = () =>
     watchTask(
@@ -110,7 +112,7 @@ const TaskDetails = () => {
           toast.success("Task deleted successfully");
           navigate(`/workspace/${workspaceId}/projects/${projectId}`);
         },
-        onError: (e) => toast.error(e?.message || "Failed"),
+        onError: (e) => toast.error(e?.response?.data?.message || "Failed"),
       }
     );
   };
@@ -189,8 +191,8 @@ const TaskDetails = () => {
             variants={itemVariants}
             className="bg-card dark:bg-gray-800 rounded-lg p-6 shadow-sm mb-6 border border-gray-200 dark:border-gray-700"
           >
-            <div className="flex flex-col md:flex-row md:items-center justify-between items-start mb-4">
-              <div>
+            <div className="flex flex-col md:flex-row md:items-center justify-between items-start mb-4 gap-4">
+              <div className="flex-1 min-w-0">
                 <Badge
                   variant={
                     task.priority === "High"
@@ -203,54 +205,86 @@ const TaskDetails = () => {
                 >
                   {task.priority} Priority
                 </Badge>
-                <TaskTitle title={task.title} taskId={task._id} />
-                <div className="text-sm text-gray-600 dark:text-gray-300">
+
+                {/* Edit title only for project creator */}
+                {isProjectCreator ? (
+                  <TaskTitle title={task.title} taskId={task._id} />
+                ) : (
+                  <h2 className="font-semibold text-lg">{task.title}</h2>
+                )}
+
+                <div className="text-sm text-gray-600 dark:text-gray-300 truncate">
                   Created{" "}
                   {formatDistanceToNow(new Date(task.createdAt), {
                     addSuffix: true,
                   })}
                 </div>
               </div>
-              <div className="flex items-center gap-2 mt-4 md:mt-0">
+
+              <div className="flex items-center gap-2 mt-4 md:mt-0 flex-shrink-0">
                 <TaskStatusSelector taskId={task._id} status={task.status} />
-                <Button
-                  className="hidden md:block"
-                  size="sm"
-                  variant="destructive"
-                  onClick={handleDelete}
-                  disabled={isDeleting}
-                >
-                  {isDeleting ? (
-                    <>
-                      <Loader2 className="animate-spin w-4 h-4 mr-1" />{" "}
-                      Deleting...
-                    </>
-                  ) : (
-                    "Delete Task"
-                  )}
-                </Button>
+
+                {/* Delete Task button only for project creator */}
+                {isProjectCreator && (
+                  <Button
+                    className="hidden md:block"
+                    size="sm"
+                    variant="destructive"
+                    onClick={handleDelete}
+                    disabled={isDeleting}
+                  >
+                    {isDeleting ? (
+                      <>
+                        <Loader2 className="animate-spin w-4 h-4 mr-1" />{" "}
+                        Deleting...
+                      </>
+                    ) : (
+                      "Delete Task"
+                    )}
+                  </Button>
+                )}
               </div>
             </div>
 
+            {/* Description */}
             <div className="mb-6">
               <h3 className="text-sm font-bold mb-2 text-gray-900 dark:text-gray-100">
                 Description
               </h3>
               <div className="p-3 rounded-lg border bg-gray-100 dark:bg-gray-700 dark:border-gray-600">
-                <TaskDescription
-                  description={task.description || ""}
-                  taskId={task._id}
-                />
+                {isProjectCreator ? (
+                  <TaskDescription
+                    description={task.description || ""}
+                    taskId={task._id}
+                  />
+                ) : (
+                  <p className="text-gray-700 dark:text-gray-200">
+                    {task.description || "No description"}
+                  </p>
+                )}
               </div>
             </div>
 
-            <TaskAssigneesSelector
-              task={task}
-              assignees={task.assignees}
-              projectMembers={allMembers}
-            />
-            <TaskPrioritySelector priority={task.priority} taskId={task._id} />
-            <SubTaskDetails subTasks={task?.subtasks || []} taskId={task._id} />
+            {/* Only project creator can edit assignees, priority, and subtasks */}
+
+            <>
+              <TaskAssigneesSelector
+                task={task}
+                assignees={task.assignees}
+                projectMembers={allMembers}
+                isProjectCreator={isProjectCreator}
+              />
+              <TaskPrioritySelector
+                priority={task.priority}
+                taskId={task._id}
+                isProjectCreator={isProjectCreator}
+              />
+              {/* <SubTaskDetails
+                subTasks={task?.subtasks || []}
+                taskId={task._id}
+                isProjectCreator={isProjectCreator}
+              /> */}
+            </>
           </motion.div>
 
           <CommentSection taskId={task._id} members={allMembers} />

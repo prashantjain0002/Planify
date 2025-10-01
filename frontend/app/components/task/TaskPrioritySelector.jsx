@@ -9,9 +9,12 @@ import {
 import { useUpdateTaskPriorityMutatuion } from "@/hooks/useTask";
 import { toast } from "sonner";
 
-const TaskPrioritySelector = ({ taskId, priority }) => {
+const TaskPrioritySelector = ({ taskId, priority, isProjectCreator }) => {
   const { mutate, isPending } = useUpdateTaskPriorityMutatuion();
+
   const handlePriorityChange = (value) => {
+    if (!isProjectCreator) return;
+
     mutate(
       { taskId, priority: value },
       {
@@ -19,9 +22,9 @@ const TaskPrioritySelector = ({ taskId, priority }) => {
           toast.success("Task priority updated successfully");
         },
         onError: (error) => {
-          console.log(error);
-          const errorMessage = error?.message;
-          toast.error(errorMessage);
+          console.error(error);
+          const errorMessage = error?.response?.data?.message;
+          toast.error(errorMessage || "Failed to update priority");
         },
       }
     );
@@ -31,9 +34,9 @@ const TaskPrioritySelector = ({ taskId, priority }) => {
     <Select
       value={priority || ""}
       onValueChange={handlePriorityChange}
-      diabled={isPending}
+      disabled={!isProjectCreator || isPending}
     >
-      <SelectTrigger className={"w-[180px]"}>
+      <SelectTrigger className="w-[180px]">
         <SelectValue placeholder="Priority" />
       </SelectTrigger>
 

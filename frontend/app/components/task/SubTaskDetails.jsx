@@ -6,14 +6,21 @@ import { Button } from "../ui/button";
 import { useAddSubTask, useUpdateSubTaskMutatuion } from "@/hooks/useTask";
 import { toast } from "sonner";
 
-const SubTaskDetails = ({ subTasks, taskId }) => {
+const SubTaskDetails = ({ subTasks, taskId, isProjectCreator }) => {
   const [newSubTask, setNewSubTask] = useState("");
 
-  const { mutate: addSubTask, isPending } = useAddSubTask();
+  const { mutate: addSubTask, isPending: isAdding } = useAddSubTask();
   const { mutate: updateSubTask, isPending: isUpdating } =
     useUpdateSubTaskMutatuion();
 
   const handleAddSubTask = () => {
+    if (!isProjectCreator) return;
+
+    if (!newSubTask.trim()) {
+      toast.error("Sub task title cannot be empty");
+      return;
+    }
+
     addSubTask(
       { taskId, title: newSubTask },
       {
@@ -22,8 +29,9 @@ const SubTaskDetails = ({ subTasks, taskId }) => {
           toast.success("Sub task added successfully");
         },
         onError: (error) => {
-          const errorMessage = error?.message;
-          console.log(error);
+          console.error(error);
+          const errorMessage =
+            error?.response?.data?.message || "Failed to add subtask";
           toast.error(errorMessage);
         },
       }
@@ -31,16 +39,15 @@ const SubTaskDetails = ({ subTasks, taskId }) => {
   };
 
   const handleUpdateTask = (subTaskId, checked) => {
+    if (!isProjectCreator) return;
+
     updateSubTask(
       { taskId, subTaskId, completed: checked },
       {
-        onSuccess: () => {
-          toast.success("Sub task updated successfully");
-        },
+        onSuccess: () => toast.success("Sub task updated successfully"),
         onError: (error) => {
-          const errorMessage = error?.message;
-          console.log(error);
-          toast.error(errorMessage);
+          console.error(error);
+          toast.error(error?.message || "Failed to update subtask");
         },
       }
     );
@@ -61,9 +68,8 @@ const SubTaskDetails = ({ subTasks, taskId }) => {
                   onCheckedChange={(checked) =>
                     handleUpdateTask(subTask._id, !!checked)
                   }
-                  disabled={isPending || isUpdating}
+                  disabled={!isProjectCreator || isUpdating || isAdding}
                 />
-
                 <label
                   className={cn(
                     "text-sm font-medium",
@@ -79,18 +85,23 @@ const SubTaskDetails = ({ subTasks, taskId }) => {
           <div className="text-sm font-medium text-center">No sub tasks</div>
         )}
 
-        <div className="flex items-center gap-2">
-          <Input
-            placeholder="Add sub task"
-            value={newSubTask}
-            onChange={(e) => setNewSubTask(e.target.value)}
-            className={"mr-1"}
-            disabled={isPending || isUpdating}
-          />
-          <Button onClick={handleAddSubTask} disabled={isPending || isUpdating}>
-            Add
-          </Button>
-        </div>
+        {isProjectCreator && (
+          <div className="flex items-center gap-2 mt-2">
+            <Input
+              placeholder="Add sub task"
+              value={newSubTask}
+              onChange={(e) => setNewSubTask(e.target.value)}
+              className="mr-1"
+              disabled={isAdding || isUpdating}
+            />
+            <Button
+              onClick={handleAddSubTask}
+              disabled={isAdding || isUpdating}
+            >
+              Add
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -93,7 +93,7 @@ const CreateTaskDialog = ({
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Project Name</FormLabel>
+                  <FormLabel>Task Name</FormLabel>
                   <FormControl>
                     <Input placeholder="Task name" {...field} />
                   </FormControl>

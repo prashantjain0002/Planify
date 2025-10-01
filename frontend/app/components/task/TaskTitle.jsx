@@ -10,7 +10,7 @@ const TaskTitle = ({ title, taskId }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [newTitle, setNewTitle] = useState(title);
 
-  const { mutate, isPending } = useUpdateTaskTitleMutatuion();
+  const { mutate } = useUpdateTaskTitleMutatuion();
 
   const updateTitle = () => {
     mutate(
@@ -22,40 +22,45 @@ const TaskTitle = ({ title, taskId }) => {
         },
         onError: (error) => {
           const errorMessage = error?.response?.data?.message;
-          console.log(error);
-          toast.error(errorMessage);
+          toast.error(errorMessage || "Something went wrong");
         },
       }
     );
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 w-full">
       {isEditing ? (
-        <Input
-          className={"text-xl font-semibold w-full min-w-3xl"}
-          value={newTitle}
-          onChange={(e) => setNewTitle(e.target.value)}
-          disabled={isPending}
-        />
+        <div className="flex-1 min-w-0 flex items-center gap-2">
+          <Input
+            className="text-xl font-semibold w-full min-w-0 truncate"
+            value={newTitle}
+            onChange={(e) => setNewTitle(e.target.value)}
+          />
+          <Button size="sm" onClick={updateTitle}>
+            Save
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              setNewTitle(title); // revert changes
+              setIsEditing(false); // exit edit mode
+            }}
+          >
+            Cancel
+          </Button>
+        </div>
       ) : (
-        <h2 className="text-xl font-semibold flex-1">{title}</h2>
-      )}
-
-      {isEditing ? (
-        <Button
-          className={"py-0"}
-          size={"sm"}
-          onClick={updateTitle}
-          disabled={isPending}
-        >
-          {isPending ? <Loader /> : "Save"}
-        </Button>
-      ) : (
-        <Edit
-          className="size-5 cursor-pointer text-blue-500 hover:text-blue-600"
-          onClick={() => setIsEditing(true)}
-        />
+        <>
+          <h2 className="text-xl font-semibold flex-1 min-w-0 truncate">
+            {title}
+          </h2>
+          <Edit
+            className="size-5 cursor-pointer text-blue-500 hover:text-blue-600"
+            onClick={() => setIsEditing(true)}
+          />
+        </>
       )}
     </div>
   );

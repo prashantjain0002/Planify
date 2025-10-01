@@ -22,7 +22,8 @@ const TaskDescription = ({ description, taskId }) => {
           toast.success("Task description updated successfully");
         },
         onError: (error) => {
-          const errorMessage = error?.message || "something went wrong";
+          const errorMessage =
+            error?.response?.data?.message || "something went wrong";
           console.log(error);
           toast.error(errorMessage);
         },
@@ -40,14 +41,22 @@ const TaskDescription = ({ description, taskId }) => {
             onChange={(e) => setNewDescription(e.target.value)}
             disabled={isPending}
           />
-          <Button
-            className="my-auto self-start flex-shrink-0"
-            size="sm"
-            onClick={updateDescription}
-            disabled={isPending}
-          >
-            {isPending ? <Loader /> : "Save"}
-          </Button>
+          <div className="flex gap-2 my-auto self-start flex-shrink-0">
+            <Button size="sm" onClick={updateDescription} disabled={isPending}>
+              {isPending ? <Loader /> : "Save"}
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                setIsEditing(false);
+                setNewDescription(description); // reset to original
+              }}
+              disabled={isPending}
+            >
+              Cancel
+            </Button>
+          </div>
         </>
       ) : (
         <>
