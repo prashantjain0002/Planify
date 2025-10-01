@@ -129,10 +129,12 @@ const MyTasks = () => {
     >
       {/* Header */}
       <motion.div
-        className="flex items-start md:items-center justify-between"
+        className="flex flex-col md:flex-row md:items-center justify-between gap-4"
         variants={cardVariants}
       >
-        <h1 className="text-2xl font-bold">My Tasks</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          My Tasks
+        </h1>
         <div className="flex flex-col md:flex-row gap-2 items-start md:items-center">
           <Button
             variant="outline"
@@ -194,10 +196,12 @@ const MyTasks = () => {
 
         {/* List View */}
         <TabsContent value="list" className="mb-4">
-          <Card>
+          <Card className="dark:bg-gray-800">
             <CardHeader>
-              <CardTitle className="text-lg font-semibold">My Tasks</CardTitle>
-              <CardDescription className="text-sm text-muted-foreground">
+              <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                My Tasks
+              </CardTitle>
+              <CardDescription className="text-sm text-muted-foreground dark:text-gray-400">
                 {sortedTasks.length} tasks assigned to you
               </CardDescription>
             </CardHeader>
@@ -206,7 +210,7 @@ const MyTasks = () => {
                 {sortedTasks.map((task) => (
                   <motion.div
                     key={task._id}
-                    className="p-4 hover:bg-accent/40 transition-colors flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+                    className="p-4 hover:bg-accent/40 dark:hover:bg-gray-700 transition-colors flex flex-col md:flex-row md:items-center md:justify-between gap-4"
                     variants={cardVariants}
                   >
                     {/* Left Section */}
@@ -219,7 +223,7 @@ const MyTasks = () => {
                       <div>
                         <Link
                           to={`/workspace/${task.project[0].workspace}/projects/${task.project[0]._id}/tasks/${task._id}`}
-                          className="font-medium text-base hover:text-blue-500 hover:underline transition-colors flex items-center gap-1"
+                          className="font-medium text-base hover:text-blue-500 hover:underline transition-colors flex items-center gap-1 dark:text-gray-100"
                         >
                           {task.title} <ArrowRight className="size-4" />
                         </Link>
@@ -259,24 +263,24 @@ const MyTasks = () => {
                     {/* Right Section */}
                     <div className="flex flex-col items-start md:items-end gap-2 text-sm">
                       {task.status === "Done" ? (
-                        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-600">
+                        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-900 dark:text-emerald-400">
                           <CheckCircle className="size-4" />
                           <span className="font-medium">Completed</span>
                         </div>
                       ) : (
                         task.dueDate && (
                           <div
-                            className={`flex items-center gap-2 px-3 py-1 rounded-full transition-all duration-300 ${
+                            className={`flex items-center gap-2 px-3 py-1 rounded-full transition-all duration-300 text-sm font-medium ${
                               new Date(task.dueDate) < new Date()
-                                ? "bg-red-100 text-red-600"
+                                ? "bg-red-100 text-red-600 dark:bg-red-900 dark:text-red-400"
                                 : new Date(task.dueDate).toDateString() ===
                                     new Date().toDateString()
-                                  ? "bg-yellow-100 text-yellow-600"
-                                  : "bg-green-100 text-green-600"
+                                  ? "bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-400"
+                                  : "bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-400"
                             }`}
                           >
                             <CalendarDays className="size-4" />
-                            <span className="font-medium">
+                            <span>
                               Due - {format(new Date(task.dueDate), "PPPP")}
                             </span>
                           </div>
@@ -284,7 +288,7 @@ const MyTasks = () => {
                       )}
 
                       {task.project?.length > 0 && (
-                        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-blue-600 w-fit">
+                        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 text-sm w-fit">
                           <FolderKanban className="size-4" />
                           <span>{task.project[0]?.title}</span>
                         </div>
@@ -302,10 +306,10 @@ const MyTasks = () => {
                 ))}
 
                 {sortedTasks.length === 0 && (
-                  <div className="flex flex-col items-center justify-center py-20 text-center text-gray-400">
-                    <Inbox className="w-16 h-16 mb-4 text-gray-300" />
+                  <div className="flex flex-col items-center justify-center py-20 text-center text-gray-400 dark:text-gray-500">
+                    <Inbox className="w-16 h-16 mb-4 text-gray-300 dark:text-gray-500" />
                     <h2 className="text-lg font-semibold">No tasks found</h2>
-                    <p className="text-sm text-gray-400">
+                    <p className="text-sm text-gray-400 dark:text-gray-500">
                       Try adjusting your filters or adding a new task.
                     </p>
                   </div>
@@ -318,10 +322,10 @@ const MyTasks = () => {
         {/* Grid View */}
         <TabsContent value="grid" className="mb-4">
           {sortedTasks.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-center text-gray-400">
-              <Inbox className="w-16 h-16 mb-4 text-gray-300" />
+            <div className="flex flex-col items-center justify-center py-20 text-center text-gray-400 dark:text-gray-500">
+              <Inbox className="w-16 h-16 mb-4 text-gray-300 dark:text-gray-500" />
               <h2 className="text-lg font-semibold">No tasks found</h2>
-              <p className="text-sm text-gray-400">
+              <p className="text-sm text-gray-400 dark:text-gray-500">
                 Try adjusting your filters or adding a new task.
               </p>
             </div>
@@ -362,7 +366,7 @@ const MyTasks = () => {
                       )}
                       <Link
                         to={`/workspace/${task.project[0].workspace}/projects/${task.project[0]._id}/tasks/${task._id}`}
-                        className="font-semibold text-base hover:text-blue-500 hover:underline transition-colors"
+                        className="font-semibold text-base hover:text-blue-500 hover:underline transition-colors dark:text-gray-100"
                       >
                         {task.title}
                       </Link>
@@ -370,7 +374,7 @@ const MyTasks = () => {
                   </CardHeader>
 
                   <CardContent className="px-4 pb-4 space-y-2">
-                    <motion.div className="flex flex-wrap items-center gap-2">
+                    <motion.div className="flex flex-wrap items-center gap-2 justify-center">
                       <Badge
                         variant={
                           task.status === "Done"
@@ -402,13 +406,13 @@ const MyTasks = () => {
 
                     {task.dueDate && task.status !== "Done" && (
                       <div
-                        className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium transition-all duration-300 ${
+                        className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium transition-all duration-300 justify-center text-center ${
                           new Date(task.dueDate) < new Date()
-                            ? "bg-red-100 text-red-600"
+                            ? "bg-red-100 text-red-600 dark:bg-red-900 dark:text-red-400"
                             : new Date(task.dueDate).toDateString() ===
                                 new Date().toDateString()
-                              ? "bg-yellow-100 text-yellow-600"
-                              : "bg-green-100 text-green-600"
+                              ? "bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-400"
+                              : "bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-400"
                         }`}
                       >
                         <CalendarDays className="size-4" />
@@ -419,16 +423,16 @@ const MyTasks = () => {
                     )}
 
                     {task.project?.length > 0 && (
-                      <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-blue-600 text-sm w-fit">
+                      <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 text-sm w-fit mx-auto">
                         <FolderKanban className="size-4" />
                         <span>{task.project[0]?.title}</span>
                       </div>
                     )}
 
-                    <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 text-xs w-fit">
+                    <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 text-xs w-fit mx-auto text-center">
                       <Clock className="size-4" />
                       <span>
-                        Modified On - {format(new Date(task.updatedAt), "PPPP")}
+                         {format(new Date(task.updatedAt), "PPPP")}
                       </span>
                     </div>
                   </CardContent>

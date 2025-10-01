@@ -23,7 +23,7 @@ const Members = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialSearch = searchParams.get("search") || "";
   const [search, setSearch] = useState(initialSearch);
-  
+
   const { selectedWorkspace } = useWorkspace();
   const workspaceId = selectedWorkspace?._id || searchParams.get("workspaceId");
 
@@ -103,7 +103,9 @@ const Members = () => {
         className="flex items-start md:items-center justify-between"
         variants={cardVariants}
       >
-        <h1 className="text-2xl font-bold">Members</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          Members
+        </h1>
       </motion.div>
 
       {/* Search */}
@@ -125,10 +127,12 @@ const Members = () => {
 
         {/* List View */}
         <TabsContent value="list" className="mb-4">
-          <Card>
+          <Card className="dark:bg-gray-800">
             <CardHeader>
-              <CardTitle className="text-lg font-semibold">Members</CardTitle>
-              <CardDescription className="text-sm text-muted-foreground">
+              <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                Members
+              </CardTitle>
+              <CardDescription className="text-sm text-muted-foreground dark:text-gray-400">
                 {filteredMembers?.length} members in your workspace
               </CardDescription>
             </CardHeader>
@@ -137,13 +141,13 @@ const Members = () => {
                 {filteredMembers?.map((member) => (
                   <motion.div
                     key={member._id}
-                    className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors rounded-lg"
+                    className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors rounded-lg"
                     variants={cardVariants}
                   >
                     <div className="flex items-center gap-4">
                       <Avatar className="bg-gray-500 w-12 h-12">
                         <AvatarImage src={member.user.profilePicture} />
-                        <AvatarFallback className="text-black/45 font-bold text-lg">
+                        <AvatarFallback className="text-black/45 dark:text-gray-200 font-bold text-lg">
                           {member.user.name.charAt(0)}
                         </AvatarFallback>
                       </Avatar>
@@ -199,7 +203,7 @@ const Members = () => {
               >
                 <Avatar className="w-20 h-20 mb-4 ring-2 ring-green-400 dark:ring-green-600">
                   <AvatarImage src={member.user.profilePicture} />
-                  <AvatarFallback className="text-black/60 font-bold text-2xl">
+                  <AvatarFallback className="text-black/60 dark:text-gray-200 font-bold text-2xl">
                     {member.user.name.charAt(0)}
                   </AvatarFallback>
                 </Avatar>

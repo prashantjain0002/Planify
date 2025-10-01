@@ -45,22 +45,29 @@ const WorkSpaceHeader = ({
       </div>
 
       {members.length > 0 && (
-        <div className="flex space-x-2 items-center">
-          <p className="font-semibold text-muted-foreground">Members</p>
-          {members.map((member) => (
-            <Avatar
-              key={member._id}
-              className={
-                "relative w-10 h-10 rounded-full border-2 border-background overflow-hidden"
-              }
-            >
-              <AvatarImage
-                src={member.user?.profilePicture}
-                alt={member.user?.name}
-              />
-              <AvatarFallback>{member.user?.name.charAt(0)}</AvatarFallback>
-            </Avatar>
-          ))}
+        <div className="flex items-center">
+          <p className="font-semibold text-muted-foreground mr-3">Members</p>
+
+          <div className="flex -space-x-3">
+            {members.map((member) => (
+              <div key={member._id} className="relative group">
+                <Avatar className="w-10 h-10 rounded-full border-2 border-white dark:border-gray-800 shadow-sm hover:scale-110 transition-transform duration-200">
+                  <AvatarImage
+                    src={member.user?.profilePicture}
+                    alt={member.user?.name}
+                  />
+                  <AvatarFallback className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200">
+                    {member.user?.name.charAt(0)}
+                  </AvatarFallback>
+                </Avatar>
+
+                {/* Tooltip */}
+                <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-max px-2 py-1 text-xs rounded-md bg-gray-800 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
+                  {member.user?.name}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>

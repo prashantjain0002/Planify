@@ -15,7 +15,7 @@ import React, { useState } from "react";
 import { href, Link } from "react-router";
 import { Button } from "../ui/button";
 import { ScrollArea } from "../ui/scroll-area";
-import SidebarNav from "./sidebarNav";
+import SidebarNav from "./SidebarNav";
 
 const Sidebar = ({ currentWorkspace }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -60,49 +60,57 @@ const Sidebar = ({ currentWorkspace }) => {
         isCollapsed ? "w-16 md:w-[80px]" : "w-16 md:w-[240px]"
       )}
     >
+      {/* Logo / Header */}
       <div className="flex h-14 items-center border-b px-4 mb-4">
-        <Link to="/dashboard" className="flex items-center">
+        <Link to="/dashboard" className="flex items-center gap-2">
+          <Wrench className="size-6 text-blue-500" />
           {!isCollapsed && (
-            <div className="flex items-center gap-2">
-              <Wrench className="size-6 text-blue-500" />
-              <span className="font-semibold text-lg hidden md:block text-blue-500">
-                Planify
-              </span>
-            </div>
+            <span className="font-semibold text-lg text-blue-500 hidden md:block">
+              Planify
+            </span>
           )}
-
-          {isCollapsed && <Wrench className="size-6 text-blue-500" />}
         </Link>
 
+        {/* Collapse Toggle */}
         <Button
-          variant={"ghost"}
-          size={"icon"}
-          className={"ml-auto md:block flex justify-center"}
+          variant="ghost"
+          size="icon"
+          className="ml-auto flex justify-center"
           onClick={() => setIsCollapsed(!isCollapsed)}
         >
-          {isCollapsed ? (
-            <ChevronRight className="size-4" />
-          ) : (
-            <ChevronRight className="rotate-180 size-4" />
-          )}
+          <ChevronRight
+            className={cn(
+              "size-4 transition-transform duration-300",
+              isCollapsed && "rotate-0",
+              !isCollapsed && "rotate-180"
+            )}
+          />
         </Button>
       </div>
 
+      {/* Navigation */}
       <ScrollArea className="flex-1 px-3 py-2">
         <SidebarNav
           items={navItems}
           isCollapsed={isCollapsed}
           currentWorkspace={currentWorkspace}
-          className={isCollapsed && "items-center space-y-2"}
+          className={cn(isCollapsed && "items-center space-y-2")}
         />
       </ScrollArea>
+
+      {/* Logout Button */}
       <div className="mx-3 mb-2">
         <Button
           size={isCollapsed ? "icon" : "default"}
           onClick={logout}
-          className={"w-full bg-red-500 hover:bg-red-600"}
+          className={cn(
+            "w-full transition-colors duration-200",
+            "bg-red-500 hover:bg-red-600",
+            "flex items-center justify-center gap-2"
+          )}
         >
-          <LogOut className={cn("size-4", isCollapsed && "mr-2")} /> Logout
+          <LogOut className="size-4" />
+          {!isCollapsed && "Logout"}
         </Button>
       </div>
     </div>

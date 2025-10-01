@@ -150,7 +150,7 @@ const ProjectDetails = () => {
         <div>
           <div>
             {project.description && (
-              <p className="text-gray-500 text-sm mt-2">
+              <p className="text-gray-500 dark:text-gray-300 text-sm mt-2">
                 {project.description}
               </p>
             )}
@@ -249,19 +249,21 @@ const ProjectDetails = () => {
 
       {/* Delete Project Card */}
       <motion.div
-        className="shadow-lg rounded-3xl p-8 space-y-6 border mb-6"
+        className="shadow-lg rounded-3xl p-8 space-y-6 border bg-white dark:bg-gray-800 dark:border-gray-700 mb-6"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
         <div className="flex items-center gap-3 mb-2">
-          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-red-100">
-            <Trash2 className="h-6 w-6 text-red-600" />
+          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30">
+            <Trash2 className="h-6 w-6 text-red-600 dark:text-red-400" />
           </div>
-          <h2 className="text-2xl font-semibold text-red-600">Danger Zone</h2>
+          <h2 className="text-2xl font-semibold text-red-600 dark:text-red-400">
+            Danger Zone
+          </h2>
         </div>
 
-        <p className="text-gray-700 text-sm">
+        <p className="text-gray-700 dark:text-gray-300 text-sm">
           Deleting your project is permanent and cannot be undone.
         </p>
 
@@ -275,16 +277,22 @@ const ProjectDetails = () => {
         </Button>
 
         <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-          <DialogContent className="max-w-md rounded-xl">
+          <DialogContent className="max-w-md rounded-xl bg-white dark:bg-gray-800 dark:border-gray-700">
             <DialogHeader>
-              <DialogTitle>Confirm Deletion</DialogTitle>
-              <DialogDescription>
+              <DialogTitle className="text-gray-900 dark:text-gray-100">
+                Confirm Deletion
+              </DialogTitle>
+              <DialogDescription className="text-gray-700 dark:text-gray-300">
                 Are you sure you want to delete this project? This action cannot
                 be undone.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setDeleteOpen(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setDeleteOpen(false)}
+                className="dark:border-gray-600 dark:text-gray-100"
+              >
                 Cancel
               </Button>
               <Button
@@ -375,7 +383,7 @@ const TaskCard = ({ task, onClick }) => {
   return (
     <Card
       onClick={onClick}
-      className="cursor-pointer hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+      className="cursor-pointer hover:shadow-lg transition-all duration-300 hover:-translate-y-1 mb-3"
     >
       <CardHeader>
         <div className="flex items-center justify-between">
@@ -531,8 +539,6 @@ export function ProjectMeta({ project }) {
           <div className="flex-shrink-0">
             <motion.div
               className={`relative w-14 h-14 flex items-center justify-center rounded-full ${item.accent} shadow-lg`}
-              animate={{ scale: [1, 1.15, 1] }}
-              transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
             >
               <item.icon className="w-6 h-6" />
             </motion.div>
@@ -540,21 +546,25 @@ export function ProjectMeta({ project }) {
 
           {/* RIGHT SIDE (Label + Value) */}
           <div className="flex flex-col gap-1">
-            <h3 className="font-semibold text-gray-900">{item.label}</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+              {item.label}
+            </h3>
             {Array.isArray(item.value) ? (
               <div className="flex flex-wrap gap-2">
                 {item.value.map((tag) => (
                   <Badge
                     key={tag}
                     variant="secondary"
-                    className="px-2 py-1 rounded-full text-xs"
+                    className="px-2 py-1 rounded-full text-xs dark:bg-gray-700 dark:text-gray-200"
                   >
                     {tag}
                   </Badge>
                 ))}
               </div>
             ) : (
-              <p className="text-gray-700 text-sm">{item.value}</p>
+              <p className="text-gray-700 dark:text-gray-300 text-sm">
+                {item.value}
+              </p>
             )}
           </div>
         </motion.div>
@@ -613,7 +623,6 @@ export const ProjectTags = ({ tags }) => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: index * 0.05, duration: 0.4 }}
-          whileHover={{ scale: 1.1, y: -2 }}
         >
           <Badge className="px-3 py-1 rounded-full text-sm font-medium cursor-pointer shadow-md bg-[#2b079a] text-white">
             <TagIcon className="h-4 w-4 mr-1" /> {tag}

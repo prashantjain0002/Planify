@@ -72,9 +72,11 @@ const ArchivedTasks = () => {
     >
       {/* Header */}
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold tracking-tight">Archived Tasks</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+          Archived Tasks
+        </h1>
         {canUnarchive && (
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground dark:text-gray-400">
             You can view and navigate to tasks
           </p>
         )}
@@ -82,23 +84,28 @@ const ArchivedTasks = () => {
 
       {/* Table */}
       <motion.div
-        className="overflow-x-auto rounded-2xl border shadow-lg"
+        className="overflow-x-auto rounded-2xl border shadow-lg dark:border-gray-700 dark:shadow-gray-900"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
         <Table className="min-w-full">
-          <TableHeader className="bg-muted/50">
+          <TableHeader className="bg-gray-100 dark:bg-gray-700">
             <TableRow>
               {["Title", "Description", "Status", "Project", "Due Date"].map(
                 (header) => (
-                  <TableHead key={header} className="text-center">
+                  <TableHead
+                    key={header}
+                    className="text-center text-gray-700 dark:text-gray-200"
+                  >
                     {header}
                   </TableHead>
                 )
               )}
               {canUnarchive && (
-                <TableHead className="text-center">Actions</TableHead>
+                <TableHead className="text-center text-gray-700 dark:text-gray-200">
+                  Actions
+                </TableHead>
               )}
             </TableRow>
           </TableHeader>
@@ -107,8 +114,8 @@ const ArchivedTasks = () => {
             {paginatedTasks.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={6}
-                  className="h-24 text-center text-muted-foreground"
+                  colSpan={canUnarchive ? 6 : 5}
+                  className="h-24 text-center text-gray-500 dark:text-gray-400"
                 >
                   No archived tasks found
                 </TableCell>
@@ -117,38 +124,39 @@ const ArchivedTasks = () => {
               paginatedTasks.map((task, index) => (
                 <motion.tr
                   key={task._id}
-                  className={`transition-all hover:bg-muted/20 ${
-                    index % 2 === 0 ? "bg-muted/5" : ""
+                  className={`transition-all hover:bg-gray-50 dark:hover:bg-gray-800 ${
+                    index % 2 === 0 ? "bg-gray-50 dark:bg-gray-900/20" : ""
                   }`}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: index * 0.05 }}
                 >
-                  <TableCell className="text-center font-medium">
+                  <TableCell className="text-center font-medium text-gray-900 dark:text-gray-100">
                     {task.title}
                   </TableCell>
-                  <TableCell className="text-center max-w-xs truncate text-muted-foreground">
+                  <TableCell className="text-center max-w-xs truncate text-gray-500 dark:text-gray-400">
                     {task.description || "—"}
                   </TableCell>
                   <TableCell className="text-center">
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                        statusColors[task.status] || "bg-gray-100 text-gray-800"
+                        statusColors[task.status] ||
+                        "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
                       }`}
                     >
                       {task.status}
                     </span>
                   </TableCell>
-                  <TableCell className="text-center">
+                  <TableCell className="text-center text-gray-900 dark:text-gray-100">
                     {task.project[0]?.title || "—"}
                   </TableCell>
-                  <TableCell className="text-center">
+                  <TableCell className="text-center text-gray-900 dark:text-gray-100">
                     {task.dueDate
                       ? new Date(task.dueDate).toLocaleDateString()
                       : "—"}
                   </TableCell>
                   {canUnarchive && (
-                    <TableCell className="text-center">
+                    <TableCell className={'flex justify-center'}>
                       <Button
                         variant="outline"
                         size="sm"
@@ -184,7 +192,7 @@ const ArchivedTasks = () => {
             <ChevronLeft className="h-4 w-4" /> Previous
           </Button>
 
-          <span className="text-sm font-medium">
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
             Page {currentPage} of {totalPages}
           </span>
 

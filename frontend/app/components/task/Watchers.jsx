@@ -5,8 +5,10 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const Watchers = ({ watchers }) => {
   return (
-    <div className="bg-card rounded-xl p-6 shadow-lg mb-6 border border-gray-100">
-      <h3 className="text-lg font-semibold mb-4 text-gray-700">Watchers</h3>
+    <div className="bg-card dark:bg-gray-800 rounded-xl p-6 shadow-lg mb-6 border border-gray-100 dark:border-gray-700">
+      <h3 className="text-lg font-semibold mb-4 text-gray-700 dark:text-gray-100">
+        Watchers
+      </h3>
 
       <AnimatePresence>
         {watchers.length > 0 ? (
@@ -28,16 +30,16 @@ const Watchers = ({ watchers }) => {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
-                className="flex items-center mb-3 mr-2 shadow-sm px-3 py-2 rounded-2xl bg-muted/40 gap-2"
+                className="flex items-center shadow-sm px-3 py-2 rounded-2xl bg-gray-100/40 dark:bg-gray-700/40 gap-2"
               >
                 <Avatar>
                   <AvatarImage src={watcher.profilePicture} />
-                  <AvatarFallback className="bg-gray-800/20 flex items-center justify-center w-8">
+                  <AvatarFallback className="bg-gray-300 dark:bg-gray-600 flex items-center justify-center w-8 h-8 rounded-full">
                     {watcher.name.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
 
-                <p className="text-sm font-medium text-gray-800">
+                <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
                   {watcher.name}
                 </p>
               </motion.div>
@@ -49,7 +51,7 @@ const Watchers = ({ watchers }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="text-sm font-semibold text-center text-gray-500"
+            className="text-sm font-semibold text-center text-gray-500 dark:text-gray-400"
           >
             No Watchers
           </motion.p>

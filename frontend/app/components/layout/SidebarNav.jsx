@@ -26,7 +26,8 @@ const SidebarNav = ({ items, isCollapsed, currentWorkspace }) => {
             key={el.href}
             className={cn(
               "justify-start",
-              isActive && "bg-blue-700/80 text-white font-medium"
+              isActive &&
+                "bg-blue-700/80 text-white font-medium dark:bg-blue-700"
             )}
             onClick={handleClick}
             variant={isActive ? "outline" : "ghost"}

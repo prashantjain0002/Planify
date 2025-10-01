@@ -59,7 +59,9 @@ const TaskDetails = () => {
   if (!taskData)
     return (
       <div className="flex items-center justify-center h-screen">
-        <h1 className="text-2xl font-bold">Task not found</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          Task not found
+        </h1>
       </div>
     );
 
@@ -130,11 +132,13 @@ const TaskDetails = () => {
             onClick={() => navigate(-1)}
             variant="outline"
             size="sm"
-            className="p-4 me-4"
+            className="p-4 mr-4"
           >
             ← Back
           </Button>
-          <h1 className="font-bold text-xl md:text-2xl">{task.title}</h1>
+          <h1 className="font-bold text-xl md:text-2xl text-gray-900 dark:text-gray-100">
+            {task.title}
+          </h1>
           {task.isArchived && (
             <Badge className="ml-2" variant="destructive">
               Archived
@@ -151,11 +155,11 @@ const TaskDetails = () => {
           >
             {isUserWatching ? (
               <>
-                <EyeOff className="size-4" /> Unwatch
+                <EyeOff className="w-4 h-4" /> Unwatch
               </>
             ) : (
               <>
-                <Eye className="size-4" /> Watch
+                <Eye className="w-4 h-4" /> Watch
               </>
             )}
           </Button>
@@ -177,10 +181,13 @@ const TaskDetails = () => {
         className="flex flex-col lg:flex-row gap-4"
       >
         {/* Left Column */}
-        <motion.div variants={itemVariants} className="lg:col-span-2 w-[70%]">
+        <motion.div
+          variants={itemVariants}
+          className="lg:col-span-2 w-full lg:w-[70%]"
+        >
           <motion.div
             variants={itemVariants}
-            className="bg-card rounded-lg p-6 shadow-sm mb-6"
+            className="bg-card dark:bg-gray-800 rounded-lg p-6 shadow-sm mb-6 border border-gray-200 dark:border-gray-700"
           >
             <div className="flex flex-col md:flex-row md:items-center justify-between items-start mb-4">
               <div>
@@ -197,7 +204,7 @@ const TaskDetails = () => {
                   {task.priority} Priority
                 </Badge>
                 <TaskTitle title={task.title} taskId={task._id} />
-                <div className="text-sm text-muted-foreground">
+                <div className="text-sm text-gray-600 dark:text-gray-300">
                   Created{" "}
                   {formatDistanceToNow(new Date(task.createdAt), {
                     addSuffix: true,
@@ -215,7 +222,8 @@ const TaskDetails = () => {
                 >
                   {isDeleting ? (
                     <>
-                      <Loader2 className="animate-spin" /> Deleting...
+                      <Loader2 className="animate-spin w-4 h-4 mr-1" />{" "}
+                      Deleting...
                     </>
                   ) : (
                     "Delete Task"
@@ -225,8 +233,10 @@ const TaskDetails = () => {
             </div>
 
             <div className="mb-6">
-              <h3 className="text-sm font-bold mb-2">Description</h3>
-              <div className="p-3 rounded-lg border bg-blue-200/30">
+              <h3 className="text-sm font-bold mb-2 text-gray-900 dark:text-gray-100">
+                Description
+              </h3>
+              <div className="p-3 rounded-lg border bg-gray-100 dark:bg-gray-700 dark:border-gray-600">
                 <TaskDescription
                   description={task.description || ""}
                   taskId={task._id}
@@ -247,7 +257,10 @@ const TaskDetails = () => {
         </motion.div>
 
         {/* Right Column */}
-        <motion.div variants={itemVariants} className="w-[30%] space-y-4">
+        <motion.div
+          variants={itemVariants}
+          className="w-full lg:w-[30%] space-y-4"
+        >
           <Watchers watchers={task?.watchers || []} />
           <TaskActivity resourceId={task._id} />
         </motion.div>

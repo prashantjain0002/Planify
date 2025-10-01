@@ -26,6 +26,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useTheme } from "@/lib/provider/ThemeContext";
 
 const StatisticsCharts = ({
   stats,
@@ -34,6 +35,8 @@ const StatisticsCharts = ({
   taskPriorityData,
   workspaceProductivityData,
 }) => {
+  const { theme } = useTheme();
+  
   return (
     <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mb-8">
       <Card className={"lg:col-span-2"}>
@@ -223,10 +226,10 @@ const StatisticsCharts = ({
         <CardContent className={"w-full overflow-x-auto md:overflow-x-hidden"}>
           <div className="min-w-[350px] flex flex-col items-center">
             <ChartContainer
-              className={"h-[300px] flex justify-center"}
+              className="h-[300px] flex justify-center"
               config={{
                 completed: { color: "#3b82f6" },
-                total: { color: "red" },
+                total: { color: theme === "dark" ? "#f3f4f6" : "#000000" },
               }}
             >
               <BarChart
@@ -235,33 +238,37 @@ const StatisticsCharts = ({
                 barSize={20}
               >
                 <XAxis
-                  dataKey={"name"}
-                  stroke="#888888"
+                  dataKey="name"
+                  stroke={theme === "dark" ? "#d1d5db" : "#888888"}
                   fontSize={12}
                   tickLine={false}
                   axisLine={false}
                 />
                 <YAxis
-                  stroke="#888888"
+                  stroke={theme === "dark" ? "#d1d5db" : "#888888"}
                   fontSize={12}
                   tickLine={false}
                   axisLine={false}
                 />
-                <CartesianGrid strokeDasharray={"3 3"} vertical={false} />
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  vertical={false}
+                  stroke={theme === "dark" ? "#374151" : "#e5e7eb"}
+                />
                 <ChartTooltip content={<ChartTooltipContent />} />
 
                 <Bar
-                  dataKey={"total"}
-                  fill="#000"
+                  dataKey="total"
+                  fill={theme === "dark" ? "#f3f4f6" : "#000"}
                   radius={[4, 4, 0, 0]}
-                  name={"Total Tasks"}
+                  name="Total Tasks"
                 />
 
                 <Bar
-                  dataKey={"completed"}
+                  dataKey="completed"
                   fill="#3b82f6"
                   radius={[4, 4, 0, 0]}
-                  name={"Completed"}
+                  name="Completed"
                 />
 
                 <ChartLegend content={<ChartLegendContent />} />

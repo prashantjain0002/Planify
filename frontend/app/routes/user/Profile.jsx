@@ -123,7 +123,7 @@ const Profile = () => {
 
   return (
     <motion.div
-      className="space-y-6"
+      className="space-y-8"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
@@ -134,7 +134,7 @@ const Profile = () => {
           onClick={() => navigate(-1)}
           variant="outline"
           size="sm"
-          className="p-4 transition-transform hover:scale-105"
+          className="p-4 transition-transform"
         >
           ← Back
         </Button>
@@ -149,11 +149,11 @@ const Profile = () => {
 
       {/* Profile Card */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
+        initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.2, duration: 0.4 }}
       >
-        <Card className="shadow-md hover:shadow-lg transition-shadow">
+        <Card className="shadow-md hover:shadow-lg transition-shadow rounded-xl">
           <CardHeader>
             <CardTitle>Personal Information</CardTitle>
             <CardDescription>Update your name and avatar.</CardDescription>
@@ -163,11 +163,11 @@ const Profile = () => {
             <Form {...profileForm}>
               <form
                 onSubmit={profileForm.handleSubmit(handleProfileFormSubmit)}
-                className="space-y-4"
+                className="space-y-6"
               >
-                <div className="flex items-center gap-6 mb-6">
-                  <motion.div whileHover={{ scale: 1.05 }}>
-                    <Avatar className="h-20 w-20 border-2 border-primary shadow-md">
+                <div className="flex items-center gap-6">
+                  <motion.div>
+                    <Avatar className="h-20 w-20 border-2 border-blue-500 shadow-md">
                       <AvatarImage
                         src={
                           profileForm.watch("profilePicture") ||
@@ -181,7 +181,7 @@ const Profile = () => {
                     </Avatar>
                   </motion.div>
 
-                  <div>
+                  <div className="flex flex-col gap-2">
                     <input
                       type="file"
                       id="avatarUpload"
@@ -197,7 +197,7 @@ const Profile = () => {
                       onClick={() =>
                         document.getElementById("avatarUpload")?.click()
                       }
-                      className="transition-transform hover:scale-105"
+                      className="transition-transform"
                     >
                       Change Avatar
                     </Button>
@@ -211,16 +211,22 @@ const Profile = () => {
                     <FormItem>
                       <FormLabel>Full Name</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input {...field} placeholder="Your full name" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                <div className="grid gap-2">
+                <div className="grid gap-1">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" disabled value={user?.email} />
+                  <Input
+                    id="email"
+                    type="email"
+                    disabled
+                    value={user?.email}
+                    className="bg-gray-100 cursor-not-allowed"
+                  />
                   <p className="text-xs text-muted-foreground">
                     Your email cannot be changed
                   </p>
@@ -228,7 +234,7 @@ const Profile = () => {
 
                 <Button
                   type="submit"
-                  className="w-full transition-transform hover:scale-[1.02]"
+                  className="w-full transition-transform  bg-blue-500 text-white"
                   disabled={isUpdatingProfile}
                 >
                   {isUpdatingProfile ? (
@@ -248,11 +254,11 @@ const Profile = () => {
 
       {/* Change Password Card */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
+        initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.3, duration: 0.4 }}
       >
-        <Card className="shadow-md hover:shadow-lg transition-shadow">
+        <Card className="shadow-md hover:shadow-lg transition-shadow rounded-xl">
           <CardHeader>
             <CardTitle>Change Password</CardTitle>
             <CardDescription>
@@ -266,63 +272,38 @@ const Profile = () => {
                 onSubmit={passwordForm.handleSubmit(handlePasswordChange)}
                 className="space-y-4"
               >
-                <FormField
-                  control={passwordForm.control}
-                  name="currentPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Current Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="password"
-                          placeholder="••••••••"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={passwordForm.control}
-                  name="newPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>New Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="password"
-                          placeholder="••••••••"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={passwordForm.control}
-                  name="confirmPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Confirm New Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="password"
-                          placeholder="••••••••"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {["currentPassword", "newPassword", "confirmPassword"].map(
+                  (fieldName, idx) => (
+                    <FormField
+                      key={idx}
+                      control={passwordForm.control}
+                      name={fieldName}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            {fieldName === "currentPassword"
+                              ? "Current Password"
+                              : fieldName === "newPassword"
+                                ? "New Password"
+                                : "Confirm New Password"}
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              type="password"
+                              placeholder="••••••••"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )
+                )}
 
                 <Button
                   type="submit"
-                  className="w-full transition-transform hover:scale-[1.02] bg-primary text-white"
+                  className="w-full transition-transform  bg-blue-500 text-white"
                   disabled={isChangingPassword}
                 >
                   {isChangingPassword ? (

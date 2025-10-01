@@ -100,18 +100,19 @@ const WorkspaceSettings = () => {
 
   return (
     <div className="mx-auto space-y-6">
+      {/* Back Button */}
       <Button
         onClick={() => navigate(-1)}
-        variant={"outline"}
-        size={"sm"}
-        className={"p-4 mr-4"}
+        variant="outline"
+        size="sm"
+        className="p-4 mr-4"
       >
         ← Back
       </Button>
 
       {/* Workspace Settings */}
       <motion.div
-        className="bg-white shadow-lg rounded-3xl p-8 space-y-6"
+        className="bg-white dark:bg-gray-800 shadow-lg dark:shadow-gray-900 rounded-3xl p-8 space-y-6"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -124,7 +125,9 @@ const WorkspaceSettings = () => {
           <>
             <div className="flex items-center gap-3 mb-4">
               <Palette className="h-6 w-6 text-indigo-500" />
-              <h2 className="text-2xl font-semibold">Workspace Settings</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+                Workspace Settings
+              </h2>
             </div>
 
             <Form {...form}>
@@ -132,6 +135,7 @@ const WorkspaceSettings = () => {
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="space-y-4"
               >
+                {/* Name Field */}
                 <FormField
                   control={form.control}
                   name="name"
@@ -150,6 +154,7 @@ const WorkspaceSettings = () => {
                   )}
                 />
 
+                {/* Description Field */}
                 <FormField
                   control={form.control}
                   name="description"
@@ -168,6 +173,7 @@ const WorkspaceSettings = () => {
                   )}
                 />
 
+                {/* Color Picker */}
                 <FormField
                   control={form.control}
                   name="color"
@@ -186,7 +192,7 @@ const WorkspaceSettings = () => {
                               )}
                               style={{ backgroundColor: c }}
                               onClick={() => field.onChange(c)}
-                            ></div>
+                            />
                           ))}
                         </div>
                       </FormControl>
@@ -204,7 +210,7 @@ const WorkspaceSettings = () => {
                     {isPending ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>Saving...</span>
+                        Saving...
                       </>
                     ) : (
                       "Save Changes"
@@ -219,16 +225,18 @@ const WorkspaceSettings = () => {
 
       {/* Transfer Workspace */}
       <motion.div
-        className="bg-white shadow-lg rounded-3xl p-8 space-y-6"
+        className="bg-white dark:bg-gray-800 shadow-lg dark:shadow-gray-900 rounded-3xl p-8 space-y-6"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
       >
         <div className="flex items-center gap-3 mb-4">
           <SendToBack className="h-6 w-6 text-yellow-500" />
-          <h2 className="text-2xl font-semibold">Transfer Workspace</h2>
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+            Transfer Workspace
+          </h2>
         </div>
-        <p className="text-gray-600">
+        <p className="text-gray-600 dark:text-gray-300">
           Transfer ownership of this workspace to another user. Use with
           caution.
         </p>
@@ -242,7 +250,7 @@ const WorkspaceSettings = () => {
 
       {/* Danger Zone */}
       <motion.div
-        className="bg-white shadow-lg rounded-3xl p-8 space-y-6"
+        className="bg-white dark:bg-gray-800 shadow-lg dark:shadow-gray-900 rounded-3xl p-8 space-y-6"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
@@ -251,7 +259,7 @@ const WorkspaceSettings = () => {
           <Trash2 className="h-6 w-6 text-red-500" />
           <h2 className="text-2xl font-semibold text-red-600">Danger Zone</h2>
         </div>
-        <p className="text-gray-600">
+        <p className="text-gray-600 dark:text-gray-300">
           Deleting your workspace is permanent and cannot be undone.
         </p>
         <Button
