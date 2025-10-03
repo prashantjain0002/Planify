@@ -68,15 +68,6 @@ export const projectSchema = z.object({
   tags: z.string().optional(),
 });
 
-// export const taskSchema = z.object({
-//   title: z.string().min(3, "Task must be at least 3 characters long"),
-//   description: z.string().optional(),
-//   status: z.enum(["To Do", "In Progress", "Done"]),
-//   priority: z.enum(["Low", "Medium", "High"]),
-//   dueDate: z.string().min(1, "Due date is required"),
-//   assigness: z.array(z.string()).min(1, "At least one Assignees are required"),
-// });
-
 export const taskSchema = z.object({
   title: z.string().min(3, "Task must be at least 3 characters long"),
   description: z.string().optional(),

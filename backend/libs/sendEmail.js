@@ -25,8 +25,6 @@ export const sendEmail = async (to, subject, templatePath, templateData) => {
       }
     );
 
-    console.log(`Email sent to ${to}`);
-
     return { success: true };
   } catch (error) {
     console.error(

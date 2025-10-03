@@ -12,8 +12,6 @@ import { toast } from "sonner";
 const TaskStatusSelector = ({ taskId, status }) => {
   const { mutate, isPending } = useUpdateTaskStatusMutatuion();
   const handleStatusChange = (value) => {
-
-    
     mutate(
       { taskId, status: value },
       {
@@ -21,8 +19,6 @@ const TaskStatusSelector = ({ taskId, status }) => {
           toast.success("Task status updated successfully");
         },
         onError: (error) => {
-            console.log(error);
-            
           const errorMessage = error?.message;
           console.log(error);
           toast.error(errorMessage);

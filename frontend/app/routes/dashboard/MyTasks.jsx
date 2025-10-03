@@ -57,7 +57,7 @@ const MyTasks = () => {
 
   const { data, isLoading } = useGetMyTasksQuery();
 
-  // Sync URL params with state
+  
   useEffect(() => {
     const params = {};
     searchParams.forEach((value, key) => (params[key] = value));
@@ -119,7 +119,7 @@ const MyTasks = () => {
 
   if (isLoading) return <Loader />;
 
-  // Framer Motion variants
+  
   const pageVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: {

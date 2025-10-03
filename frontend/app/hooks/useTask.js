@@ -17,20 +17,20 @@ export const useCreateTask = () => {
   });
 };
 
-export const useAddSubTask = () => {
-  const queryClient = useQueryClient();
+// export const useAddSubTask = () => {
+//   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (data) => {
-      return await postData(`/tasks/${data.taskId}/add-subtask`, {
-        title: data.title,
-      });
-    },
-    onSuccess: (_, { taskId }) => {
-      queryClient.invalidateQueries(["task", taskId]);
-    },
-  });
-};
+//   return useMutation({
+//     mutationFn: async (data) => {
+//       return await postData(`/tasks/${data.taskId}/add-subtask`, {
+//         title: data.title,
+//       });
+//     },
+//     onSuccess: (_, { taskId }) => {
+//       queryClient.invalidateQueries(["task", taskId]);
+//     },
+//   });
+// };
 
 export const useAddComment = () => {
   const queryClient = useQueryClient();
@@ -108,7 +108,7 @@ export const useGetArchivedTasksQuery = (workspaceId) => {
   return useQuery({
     queryKey: ["workspace", workspaceId, "archived-tasks"],
     queryFn: async () => await getData(`/tasks/${workspaceId}/archived-tasks`),
-    enabled: !!workspaceId, // only run if we have a workspaceId
+    enabled: !!workspaceId, 
   });
 };
 
@@ -197,23 +197,23 @@ export const useUpdateTaskPriorityMutatuion = () => {
   });
 };
 
-export const useUpdateSubTaskMutatuion = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (data) =>
-      updateData(`/tasks/${data.taskId}/subtask/${data.subTaskId}`, {
-        completed: data.completed,
-      }),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({
-        queryKey: ["task", data._id],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["task-activity", data._id],
-      });
-    },
-  });
-};
+// export const useUpdateSubTaskMutatuion = () => {
+//   const queryClient = useQueryClient();
+//   return useMutation({
+//     mutationFn: (data) =>
+//       updateData(`/tasks/${data.taskId}/subtask/${data.subTaskId}`, {
+//         completed: data.completed,
+//       }),
+//     onSuccess: (data) => {
+//       queryClient.invalidateQueries({
+//         queryKey: ["task", data._id],
+//       });
+//       queryClient.invalidateQueries({
+//         queryKey: ["task-activity", data._id],
+//       });
+//     },
+//   });
+// };
 
 export const useDeleteTask = () => {
   const queryClient = useQueryClient();

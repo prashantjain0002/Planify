@@ -44,7 +44,6 @@ const Profile = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
-  // Profile form
   const profileForm = useForm({
     resolver: zodResolver(profileSchema),
     defaultValues: {
@@ -53,7 +52,6 @@ const Profile = () => {
     },
   });
 
-  // Sync profile data
   useEffect(() => {
     if (user) {
       profileForm.reset({
@@ -63,7 +61,7 @@ const Profile = () => {
     }
   }, [user, profileForm]);
 
-  // Password form
+
   const passwordForm = useForm({
     resolver: zodResolver(changePasswordSchema),
     defaultValues: {

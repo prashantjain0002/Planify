@@ -10,7 +10,6 @@ export const registerUser = async (req, res) => {
     const { name, email, password } = req.body;
 
     const decision = await aj.protect(req, { email, requested: 1 });
-    // console.log("Arcjet decision", decision);
 
     if (decision.isDenied()) {
       res.writeHead(403, { "Content-Type": "application/json" });
@@ -163,8 +162,6 @@ export const verifyEmail = async (req, res) => {
 
     const payload = jwt.verify(token, process.env.JWT_SECRET);
 
-    console.log(payload);
-
     if (!payload) {
       return res.status(401).json({ message: "Unauthorized" });
     }
@@ -253,8 +250,6 @@ export const resetPasswordRequest = async (req, res) => {
       "views/resetPassword.ejs",
       { name: user.name, resetPasswordLink }
     );
-
-    console.log(emailResult);
 
     if (!emailResult.success) {
       return res.status(500).json({

@@ -14,8 +14,7 @@ const TaskAssigneesSelector = ({
   const [selectedIds, setSelectedIds] = useState([]);
   const [dropDownOpen, setDropDownOpen] = useState(false);
   const { mutate, isPending } = useUpdateTaskAssigneesMutatuion();
-
-  // Normalize members for consistent shape
+  
   const normalizedMembers = projectMembers.map((m) => {
     if (m.user) {
       return {

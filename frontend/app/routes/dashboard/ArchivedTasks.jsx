@@ -39,7 +39,6 @@ const ArchivedTasks = () => {
 
   const { data, isLoading } = useGetArchivedTasksQuery(workspaceId);
 
-  // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
@@ -55,7 +54,6 @@ const ArchivedTasks = () => {
   const { workspace, tasks } = data;
   const totalPages = Math.ceil(tasks.length / itemsPerPage);
 
-  // Slice tasks for current page
   const paginatedTasks = tasks.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage

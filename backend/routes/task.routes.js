@@ -18,7 +18,6 @@ import {
 } from "../libs/validateSchema.js";
 import {
   addComment,
-  // addSubTask
   archiveTask,
   createTask,
   deleteTask,
@@ -27,8 +26,6 @@ import {
   getCommentByTaskId,
   getMyTasks,
   getTaskById,
-  unarchiveTask,
-  // updateSubTask,
   updateTaskAssignees,
   updateTaskDescription,
   updateTaskPriority,
@@ -48,16 +45,6 @@ router.post(
   }),
   createTask
 );
-
-// router.post(
-//   "/:taskId/add-subtask",
-//   authMiddleware,
-//   validateRequest({
-//     params: parmsTaskIdSchema,
-//     body: subTaskSchema,
-//   }),
-//   addSubTask
-// );
 
 router.post(
   "/:taskId/add-comment",
@@ -136,16 +123,6 @@ router.put(
   }),
   updateTaskPriority
 );
-
-// router.put(
-//   "/:taskId/subtask/:subTaskId",
-//   authMiddleware,
-//   validateRequest({
-//     params: parmsSubTaskIdSchema,
-//     body: subTaskUpdateSchema,
-//   }),
-//   updateSubTask
-// );
 
 router.get("/my-tasks", authMiddleware, getMyTasks);
 

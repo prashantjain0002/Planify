@@ -1,4 +1,3 @@
-// src/lib/provider/workspaceContext.jsx
 import React, { createContext, useContext, useState, useEffect } from "react";
 
 const WorkspaceContext = createContext();
@@ -6,7 +5,7 @@ const WorkspaceContext = createContext();
 export const WorkspaceProvider = ({ children }) => {
   const [selectedWorkspace, setSelectedWorkspace] = useState(null);
 
-  // Load from localStorage on mount
+  
   useEffect(() => {
     const saved = localStorage.getItem("selectedWorkspace");
     if (saved) {
@@ -14,7 +13,7 @@ export const WorkspaceProvider = ({ children }) => {
     }
   }, []);
 
-  // Save to localStorage whenever it changes
+  
   useEffect(() => {
     if (selectedWorkspace) {
       localStorage.setItem(

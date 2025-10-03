@@ -13,12 +13,7 @@ import { Progress } from "../ui/progress";
 import { CalendarDays } from "lucide-react";
 import { format } from "date-fns";
 
-const ProjectCard = ({project, progress, workspaceId}) => {
-
-  console.log(project);
-  
-  
-
+const ProjectCard = ({ project, progress, workspaceId }) => {
   return (
     <Link to={`/workspace/${workspaceId}/projects/${project?._id}`}>
       <Card className="transition-all duration-300 hover:shadow-md hover:translate-y-1">

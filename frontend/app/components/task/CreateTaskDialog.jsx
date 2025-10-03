@@ -35,7 +35,6 @@ import { format } from "date-fns";
 import { Calendar } from "../ui/calendar";
 import { Checkbox } from "../ui/checkbox";
 import { toast } from "sonner";
-import { queryClient } from "@/lib/provider/reactQueryProvider";
 
 const CreateTaskDialog = ({
   open,

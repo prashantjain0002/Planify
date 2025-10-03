@@ -12,7 +12,7 @@ import {
   Wrench,
 } from "lucide-react";
 import React, { useState } from "react";
-import { href, Link } from "react-router";
+import { Link } from "react-router";
 import { Button } from "../ui/button";
 import { ScrollArea } from "../ui/scroll-area";
 import SidebarNav from "./SidebarNav";

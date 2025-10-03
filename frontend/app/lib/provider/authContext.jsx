@@ -2,13 +2,14 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { queryClient } from "./reactQueryProvider";
 import { useLocation, useNavigate } from "react-router-dom";
 import { publicRoutes } from "..";
+import Loader from "@/components/Loader";
 
 const AuthContext = createContext(undefined);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true); // start as true
+  const [isLoading, setIsLoading] = useState(true);
 
   const navigate = useNavigate();
   const currentPath = useLocation().pathname;
@@ -37,7 +38,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem("user", JSON.stringify(data.user));
     setUser(data.user);
     setIsAuthenticated(true);
-    window.location.replace("/dashboard"); // this will now work reliably
+    window.location.replace("/dashboard");
   };
 
   const logout = async () => {
@@ -50,7 +51,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   if (isLoading) {
-    return null; // or a loader here
+    return <Loader />;
   }
 
   return (

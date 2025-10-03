@@ -8,14 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { Check, Copy, Loader, Mail } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
+import { Check, Copy, Loader } from "lucide-react";
 import { Label } from "../ui/label";
 import { useInviteMemberMutation } from "@/hooks/useWorkspace";
 import { toast } from "sonner";

@@ -46,7 +46,7 @@ const Members = () => {
 
   const { data, isLoading } = useGetWorkspaceDetailsQuery(workspaceId || "0");
 
-  // Sync URL params with state
+
   useEffect(() => {
     const params = {};
     searchParams.forEach((value, key) => (params[key] = value));
@@ -87,7 +87,7 @@ const Members = () => {
     );
   }
 
-  // Framer Motion variants
+
   const pageVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: {

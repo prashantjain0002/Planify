@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useVerifyEmailMutation } from "@/hooks/useAuth";
-import { ArrowLeft, CheckCircle, Loader, XCircle } from "lucide-react";
+import { CheckCircle, Loader, XCircle } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router";
 import { toast } from "sonner";
@@ -44,16 +44,11 @@ const VerifyEmail = () => {
 
   return (
     <div className="flex flex-col items-center justify-center h-screen">
-     
       {/* <p className="text-sm text-gray-500">Verifying your email...</p> */}
 
       <Card className={"w-full max-w-md"}>
         <CardHeader>
           <h1 className="text-2xl font-bold text-center">Verify Email</h1>
-          {/* <Link to={"/sign-in"} className="flex items-center gap-3 text-sm">
-            <ArrowLeft className="w-4 h-4" />
-            Back to Sign In
-          </Link> */}
         </CardHeader>
 
         <CardContent>

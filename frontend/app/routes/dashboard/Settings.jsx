@@ -90,7 +90,6 @@ const WorkspaceSettings = () => {
   });
 
   const onSubmit = (data) => {
-    console.log(workspaceId, data);
     updateMutation.mutate(
       { workspaceId, data },
       {

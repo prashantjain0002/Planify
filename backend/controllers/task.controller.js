@@ -49,48 +49,6 @@ export const createTask = async (req, res) => {
   }
 };
 
-// export const addSubTask = async (req, res) => {
-//   try {
-//     const { taskId } = req.params;
-//     const { title } = req.body;
-
-//     const task = await Task.findById(taskId);
-//     if (!task) {
-//       return res.status(404).json({ message: "Task not found" });
-//     }
-
-//     const project = await Project.findById(task.project);
-//     if (!project) {
-//       return res.status(404).json({ message: "Project not found" });
-//     }
-
-//     if (project.createdBy.toString() !== req.user._id.toString()) {
-//       return res
-//         .status(403)
-//         .json({ message: "Only the project creator can add subtasks" });
-//     }
-
-//     const newSubTask = {
-//       title,
-//       completed: false,
-//     };
-
-//     task.subtasks.push(newSubTask);
-//     await task.save();
-
-//     if (typeof recordActivity === "function") {
-//       await recordActivity(req.user._id, "created_subtask", "Task", taskId, {
-//         description: `Created subtask "${title}"`,
-//       });
-//     }
-
-//     res.status(201).json(task);
-//   } catch (error) {
-//     console.log(error);
-//     res.status(500).json({ message: "Internal server error" });
-//   }
-// };
-
 export const addComment = async (req, res) => {
   try {
     const { taskId } = req.params;
@@ -277,8 +235,6 @@ export const getTaskById = async (req, res) => {
       return res.status(404).json({ message: "Project not found" });
     }
 
-    console.log(project);
-
     res.status(200).json({ task, project });
   } catch (error) {
     console.log(error);
@@ -324,7 +280,6 @@ export const getCommentByTaskId = async (req, res) => {
 
 export const getMyTasks = async (req, res) => {
   try {
-    console.log(req.user._id);
 
     const tasks = await Task.find({ assignees: { $in: [req.user._id] } })
       .populate("project", "title workspace")
@@ -355,7 +310,7 @@ export const getArchivedTasks = async (req, res) => {
     }
 
     const tasks = await Task.find({
-      project: { $in: workspace.projects }, // ✅ match projects
+      project: { $in: workspace.projects },
       isArchived: true,
     }).populate("project", "title");
 
@@ -452,7 +407,6 @@ export const updateTaskStatus = async (req, res) => {
   try {
     const { taskId } = req.params;
     const { status } = req.body;
-    console.log(status);
 
     const task = await Task.findById(taskId);
     if (!task) {
@@ -494,19 +448,16 @@ export const updateTaskAssignees = async (req, res) => {
     const { taskId } = req.params;
     const { assignees } = req.body;
 
-    // Find the task
     const task = await Task.findById(taskId);
     if (!task) {
       return res.status(404).json({ message: "Task not found" });
     }
 
-    // Find the project
     const project = await Project.findById(task.project);
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
     }
 
-    // Only the project creator can update assignees
     if (project.createdBy.toString() !== req.user._id.toString()) {
       return res.status(403).json({
         message: "Only the project creator can update task assignees",
@@ -516,19 +467,15 @@ export const updateTaskAssignees = async (req, res) => {
     const oldAssigneesIds = task.assignees || [];
     const newAssigneesIds = assignees || [];
 
-    // Fetch user names for old assignees
     const oldUsers = await User.find({ _id: { $in: oldAssigneesIds } });
     const oldAssigneesNames = oldUsers.map((u) => u.name);
 
-    // Fetch user names for new assignees
     const newUsers = await User.find({ _id: { $in: newAssigneesIds } });
     const newAssigneesNames = newUsers.map((u) => u.name);
 
-    // Update task
     task.assignees = newAssigneesIds;
     await task.save();
 
-    // Record activity with names
     if (typeof recordActivity === "function") {
       await recordActivity(req.user._id, "updated_task", "Task", taskId, {
         description: `Updated task assignees from [${oldAssigneesNames.join(
@@ -549,19 +496,16 @@ export const updateTaskPriority = async (req, res) => {
     const { taskId } = req.params;
     const { priority } = req.body;
 
-    // Find the task
     const task = await Task.findById(taskId);
     if (!task) {
       return res.status(404).json({ message: "Task not found" });
     }
 
-    // Find the project
     const project = await Project.findById(task.project);
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
     }
 
-    // Only the project creator can update task priority
     if (project.createdBy.toString() !== req.user._id.toString()) {
       return res
         .status(403)
@@ -570,11 +514,9 @@ export const updateTaskPriority = async (req, res) => {
 
     const oldPriority = task.priority;
 
-    // Update priority
     task.priority = priority;
     await task.save();
 
-    // Record activity
     if (typeof recordActivity === "function") {
       await recordActivity(req.user._id, "updated_task", "Task", taskId, {
         description: `Updated task priority from ${oldPriority} to ${priority}`,
@@ -587,50 +529,6 @@ export const updateTaskPriority = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
-
-// export const updateSubTask = async (req, res) => {
-//   try {
-//     const { taskId, subTaskId } = req.params;
-//     const { completed } = req.body;
-
-//     const task = await Task.findById(taskId);
-//     if (!task) {
-//       return res.status(404).json({ message: "Task not found" });
-//     }
-
-//     const project = await Project.findById(task.project);
-//     if (!project) {
-//       return res.status(404).json({ message: "Project not found" });
-//     }
-
-//     if (project.createdBy.toString() !== req.user._id.toString()) {
-//       return res
-//         .status(403)
-//         .json({ message: "Only the project creator can update subtasks" });
-//     }
-
-//     const subTask = task.subtasks.find(
-//       (subTask) => subTask._id.toString() === subTaskId
-//     );
-//     if (!subTask) {
-//       return res.status(404).json({ message: "Sub Task not found" });
-//     }
-
-//     subTask.completed = completed;
-//     await task.save();
-
-//     if (typeof recordActivity === "function") {
-//       await recordActivity(req.user._id, "updated_subtask", "Task", taskId, {
-//         description: `Updated subtask ${subTask.title}`,
-//       });
-//     }
-
-//     res.status(200).json(task);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: "Internal server error" });
-//   }
-// };
 
 export const deleteTask = async (req, res) => {
   try {

@@ -1,7 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
 import Loader from "@/components/Loader";
-// import SubTaskDetails from "@/components/task/SubTaskDetails";
 import TaskActivity from "@/components/task/TaskActivity";
 import TaskAssigneesSelector from "@/components/task/TaskAssigneesSelector";
 import TaskDescription from "@/components/task/TaskDescription";
@@ -23,10 +22,7 @@ import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useNavigate, useParams } from "react-router";
 import CommentSection from "@/components/task/CommentSection";
 import { toast } from "sonner";
-import {
-  useGetWorkspaceDetailsQuery,
-  useGetWorkspaceQuery,
-} from "@/hooks/useWorkspace";
+import { useGetWorkspaceDetailsQuery } from "@/hooks/useWorkspace";
 
 export function meta({}) {
   return [

@@ -25,7 +25,7 @@ import { cn } from "@/lib/utils";
 import { useCreateWorkspaceMutation } from "@/hooks/useWorkspace";
 import { toast } from "sonner";
 import { useNavigate } from "react-router";
-import { useWorkspace } from "@/lib/provider/workspaceContext"; // ✅ Import context
+import { useWorkspace } from "@/lib/provider/workspaceContext"; 
 
 export const colorOptions = [
   "#FF5733",

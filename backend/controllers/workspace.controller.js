@@ -187,7 +187,6 @@ export const acceptGenerateInvite = async (req, res) => {
       return res.status(404).json({ message: "Workspace not found" });
     }
 
-    // Check if user is already a member
     const isMember = workspace.members.some(
       (member) => member.user.toString() === req.user._id.toString()
     );
@@ -197,7 +196,6 @@ export const acceptGenerateInvite = async (req, res) => {
         .json({ message: "User already a member of this workspace" });
     }
 
-    // Add user to workspace
     workspace.members.push({
       user: req.user._id,
       role: "member",
@@ -205,7 +203,6 @@ export const acceptGenerateInvite = async (req, res) => {
     });
     await workspace.save();
 
-    // ✅ Add user to all projects inside this workspace
     await Project.updateMany(
       { workspace: workspaceId },
       {
@@ -219,7 +216,6 @@ export const acceptGenerateInvite = async (req, res) => {
       }
     );
 
-    // Log activity
     await recordActivity(
       req.user._id,
       "joined_workspace",
@@ -244,7 +240,6 @@ export const updateWorkspace = async (req, res) => {
     const { workspaceId } = req.params;
     const updates = req.body;
 
-    // ✅ Only allow these fields to be updated
     const allowedUpdates = ["name", "description", "color"];
     const filteredUpdates = {};
     for (const key of allowedUpdates) {
@@ -255,20 +250,17 @@ export const updateWorkspace = async (req, res) => {
       return res.status(400).json({ message: "No valid fields to update" });
     }
 
-    // Find workspace
     const workspace = await Workspace.findById(workspaceId);
     if (!workspace) {
       return res.status(404).json({ message: "Workspace not found" });
     }
 
-    // ✅ Only owner can update workspace
     if (workspace.owner.toString() !== req.user._id.toString()) {
       return res
         .status(403)
         .json({ message: "Only the workspace owner can update the workspace" });
     }
 
-    // Apply updates
     Object.assign(workspace, filteredUpdates);
     await workspace.save();
 
@@ -381,10 +373,7 @@ export const getWorkspaceProjects = async (req, res) => {
     const projects = await Project.find({
       workspace: workspaceId,
       isArchived: false,
-      // members: { $in: [req.user._id] },
-    })
-      // .populate("tasks", "status")
-      .sort({ createdAt: -1 });
+    }).sort({ createdAt: -1 });
 
     res.status(200).json({ projects, workspace });
   } catch (error) {
@@ -517,11 +506,11 @@ export const getWorkspaceStats = async (req, res) => {
     }
 
     const projectStatusData = [
-      { name: "Completed", value: 0, color: "#10b981" }, 
-      { name: "In Progress", value: 0, color: "#f59e0b" }, 
-      { name: "Planning", value: 0, color: "#3b82f6" }, 
-      { name: "Cancelled", value: 0, color: "#ef4444" }, 
-      { name: "On Hold", value: 0, color: "#6b7280" }, 
+      { name: "Completed", value: 0, color: "#10b981" },
+      { name: "In Progress", value: 0, color: "#f59e0b" },
+      { name: "Planning", value: 0, color: "#3b82f6" },
+      { name: "Cancelled", value: 0, color: "#ef4444" },
+      { name: "On Hold", value: 0, color: "#6b7280" },
     ];
 
     for (const project of projects) {

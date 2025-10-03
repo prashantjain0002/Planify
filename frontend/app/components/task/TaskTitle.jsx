@@ -4,7 +4,6 @@ import { Button } from "../ui/button";
 import { Edit } from "lucide-react";
 import { useUpdateTaskTitleMutatuion } from "@/hooks/useTask";
 import { toast } from "sonner";
-import Loader from "../Loader";
 
 const TaskTitle = ({ title, taskId }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -44,8 +43,8 @@ const TaskTitle = ({ title, taskId }) => {
             size="sm"
             variant="outline"
             onClick={() => {
-              setNewTitle(title); // revert changes
-              setIsEditing(false); // exit edit mode
+              setNewTitle(title); 
+              setIsEditing(false); 
             }}
           >
             Cancel

@@ -1,159 +1,3 @@
-// import Loader from "@/components/Loader";
-// import { Button } from "@/components/ui/button";
-// import {
-//   Card,
-//   CardContent,
-//   CardDescription,
-//   CardHeader,
-//   CardTitle,
-// } from "@/components/ui/card";
-// import WorkspaceAvatar from "@/components/workspace/WorkspaceAvatar";
-// import {
-//   useAcceptGenerateInviteMutation,
-//   useAcceptInviteMemberMutation,
-//   useGetWorkspaceDetailsQuery,
-// } from "@/hooks/useWorkspace";
-// import React from "react";
-// import { useNavigate, useParams, useSearchParams } from "react-router";
-// import { toast } from "sonner";
-
-// export function meta({}) {
-//   return [
-//     { title: "Invitation - Planify" },
-//     { name: "description", content: "Welcome to Planify" },
-//   ];
-// }
-
-// const WorkspaceInvite = () => {
-//   const { workspaceId } = useParams();
-
-//   const [searchParams] = useSearchParams();
-
-//   const token = searchParams.get("tk");
-
-//   const navigate = useNavigate();
-
-//   const { data: workspace, isLoading } =
-//     useGetWorkspaceDetailsQuery(workspaceId);
-
-//   const { data: acceptInviteByToken, isPending: isAcceptInviteByTokenPending } =
-//     useAcceptInviteMemberMutation();
-
-//   const {
-//     data: acceptGenerateInvite,
-//     isPending: isAcceptGenerateInvitePending,
-//   } = useAcceptGenerateInviteMutation();
-
-//   const handleAcceptInvite = () => {
-//     if (!workspaceId) return;
-//     if (token) {
-//       acceptGenerateInvite(token, {
-//         onSuccess: () => {
-//           toast.success("Invitation accepted successfully");
-//           navigate(`/workspaces/${workspaceId}`);
-//         },
-//         onError: (error) => {
-//           const errorMessage = error?.message;
-//           toast.error(errorMessage);
-//         },
-//       });
-//     } else {
-//       acceptGenerateInvite(workspaceId, {
-//         onSuccess: () => {
-//           toast.success("Invitation accepted successfully");
-//           navigate(`/workspaces/${workspaceId}`);
-//         },
-//       });
-//     }
-//   };
-
-//   const handleDeclineInvite = () => {
-//     toast.info("Invitation Declined");
-//     navigate("/workspaces");
-//   };
-
-//   if (isLoading)
-//     return (
-//       <div className="flex items-center justify-center h-screen">
-//         <Loader />
-//       </div>
-//     );
-
-//   if (!workspace) {
-//     return (
-//       <div className="flex items-center justify-center h-screen">
-//         <Card className={"max-w-lg w-full"}>
-//           <CardHeader>
-//             <CardTitle>Invalid Invitation</CardTitle>
-//             <CardDescription>
-//               This workspace invitation is invalid or has expired
-//             </CardDescription>
-//           </CardHeader>
-
-//           <CardContent>
-//             <Button
-//               onClick={() => navigate(`/dashboard/workspaces/${workspaceId}`)}
-//             >
-//               Go to Workspace
-//             </Button>
-//           </CardContent>
-//         </Card>
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <div className="flex items-center justify-center h-screen">
-//       <Card className={"max-w-lg w-full"}>
-//         <CardHeader>
-//           <div className="flex items-center gap-3 mb-2">
-//             <WorkspaceAvatar name={workspace.name} color={workspace.color} />
-//             <CardTitle>{workspace.name}</CardTitle>
-//           </div>
-//           <CardDescription>
-//             You have been invited to join the "<strong>{workspace.name}</strong>
-//             " workspace.
-//           </CardDescription>
-//         </CardHeader>
-//         <CardContent className={"py-4"}>
-//           {workspace.description && (
-//             <p className="text-sm text-muted-foreground">
-//               {workspace.description}
-//             </p>
-//           )}
-
-//           <div className="flex gap-3">
-//             <Button
-//               className={"flex-1"}
-//               onClick={handleAcceptInvite}
-//               disabled={
-//                 isAcceptInviteByTokenPending || isAcceptGenerateInvitePending
-//               }
-//             >
-//               {isAcceptInviteByTokenPending || isAcceptGenerateInvitePending
-//                 ? "Joining..."
-//                 : "Accept Invitation"}
-//             </Button>
-
-//             <Button
-//               variant={"destructive"}
-//               className={"flex-1"}
-//               onClick={handleDeclineInvite}
-//               disabled={
-//                 isAcceptInviteByTokenPending || isAcceptGenerateInvitePending
-//               }
-//             >
-//               Decline
-//             </Button>
-//           </div>
-//         </CardContent>
-//       </Card>
-//     </div>
-//   );
-// };
-
-// export default WorkspaceInvite;
-
 import Loader from "@/components/Loader";
 import { Button } from "@/components/ui/button";
 import {
@@ -190,7 +34,6 @@ const WorkspaceInvite = () => {
   const { data: workspace, isLoading } =
     useGetWorkspaceDetailsQuery(workspaceId);
 
-  // ✅ get both mutation functions + loading states
   const {
     mutate: acceptInviteByToken,
     isPending: isAcceptInviteByTokenPending,
@@ -205,7 +48,6 @@ const WorkspaceInvite = () => {
     if (!workspaceId) return;
 
     if (token) {
-      // ✅ use token-based mutation
       acceptInviteByToken(token, {
         onSuccess: () => {
           toast.success("Invitation accepted successfully");
@@ -216,7 +58,6 @@ const WorkspaceInvite = () => {
         },
       });
     } else {
-      // ✅ use workspaceId-based mutation
       acceptGenerateInvite(workspaceId, {
         onSuccess: () => {
           toast.success("Invitation accepted successfully");
