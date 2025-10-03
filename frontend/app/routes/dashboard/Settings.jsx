@@ -29,6 +29,7 @@ import {
   useUpdateWorkspaceMutation,
   useGetWorkspaceDetailsQuery,
   useDeleteWorkspaceMutation,
+  useTransferWorkspaceMutation,
 } from "@/hooks/useWorkspace";
 import { useWorkspace } from "@/lib/provider/workspaceContext";
 import { toast } from "sonner";
@@ -52,6 +53,7 @@ const WorkspaceSettings = () => {
   const workspaceId = selectedWorkspace?._id || searchParams.get("workspaceId");
   const navigate = useNavigate();
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [newOwnerEmail, setNewOwnerEmail] = useState("");
 
   if (!workspaceId) {
     return (
@@ -66,6 +68,8 @@ const WorkspaceSettings = () => {
     useGetWorkspaceDetailsQuery(workspaceId);
   const updateMutation = useUpdateWorkspaceMutation();
   const { mutate: deleteWorkspace, isLoading } = useDeleteWorkspaceMutation();
+  const { mutate: transferMutation, isTransferring } =
+    useTransferWorkspaceMutation();
 
   const form = useForm({
     resolver: zodResolver(workspaceSchema),
@@ -86,7 +90,8 @@ const WorkspaceSettings = () => {
           toast.success("Workspace updated successfully");
         },
         onError: (err) => {
-          const errorMessage = err?.message || "something went wrong";
+          const errorMessage =
+            err?.response?.data?.message || "something went wrong";
           console.log(err);
           toast.error(errorMessage);
         },
@@ -102,10 +107,29 @@ const WorkspaceSettings = () => {
         toast.success("Workspace deleted successfully");
       },
       onError: (err) => {
-        const errorMessage = err?.message;
+        const errorMessage = err?.response?.data?.message;
         toast.error(errorMessage);
       },
     });
+  };
+
+  const handleTransfer = () => {
+    if (!newOwnerEmail) return;
+
+    transferMutation(
+      { workspaceId, newOwnerEmail },
+      {
+        onSuccess: () => {
+          toast.success("Workspace transferred successfully!");
+          setNewOwnerEmail("");
+        },
+        onError: (err) => {
+          toast.error(
+            err?.response?.data?.message || "Failed to transfer workspace"
+          );
+        },
+      }
+    );
   };
 
   return (
@@ -246,14 +270,24 @@ const WorkspaceSettings = () => {
             Transfer Workspace
           </h2>
         </div>
+
         <p className="text-gray-600 dark:text-gray-300">
           Transfer ownership of this workspace to another user. Use with
           caution.
         </p>
+
         <div className="flex items-center gap-4 mt-4">
-          <Input placeholder="New Owner's Email" />
-          <Button className="px-6 py-2 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold shadow-md">
-            Transfer
+          <Input
+            placeholder="New Owner's Email"
+            value={newOwnerEmail}
+            onChange={(e) => setNewOwnerEmail(e.target.value)}
+          />
+          <Button
+            onClick={handleTransfer}
+            disabled={isTransferring || !newOwnerEmail}
+            className="px-6 py-2 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold shadow-md"
+          >
+            {isTransferring ? "Transferring..." : "Transfer"}
           </Button>
         </div>
       </motion.div>

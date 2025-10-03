@@ -60,26 +60,20 @@ export const updateProject = async (req, res) => {
       return res.status(400).json({ message: "Invalid workspace for project" });
     }
 
-    const isMember = project.members.some(
-      (member) => member.user.toString() === req.user._id.toString()
-    );
-    if (!isMember) {
+    const isCreator = project.createdBy.toString() === req.user._id.toString();
+    if (!isCreator) {
       return res
         .status(403)
-        .json({ message: "You are not a member of this project" });
+        .json({ message: "Only the project creator can update this project" });
     }
 
     if (title !== undefined) project.title = title;
     if (description !== undefined) project.description = description;
-    if (status !== undefined) project.status = status;
+    if (Array.isArray(tags)) project.tags = tags;
+    if (Array.isArray(members)) project.members = members;
     if (startDate !== undefined) project.startDate = startDate;
     if (dueDate !== undefined) project.dueDate = dueDate;
-    if (Array.isArray(tags)) {
-      project.tags = tags;
-    }
-    if (Array.isArray(members)) {
-      project.members = members;
-    }
+    if (status !== undefined) project.status = status;
 
     await project.save();
 
@@ -161,13 +155,10 @@ export const deleteProject = async (req, res) => {
       return res.status(400).json({ message: "Invalid workspace for project" });
     }
 
-    const isMember = project.members.some(
-      (member) => member.user.toString() === req.user._id.toString()
-    );
-    if (!isMember) {
+    if (project.createdBy.toString() !== req.user._id.toString()) {
       return res
         .status(403)
-        .json({ message: "You are not a member of this project" });
+        .json({ message: "Only the project creator can delete this project" });
     }
 
     await Task.deleteMany({ project: projectId });

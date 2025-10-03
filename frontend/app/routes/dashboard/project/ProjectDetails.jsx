@@ -73,7 +73,7 @@ const ProjectDetails = () => {
           navigate(`/workspaces/${workspaceId}`);
         },
         onError: (error) => {
-          const errorMessage = error?.message;
+          const errorMessage = error?.response?.data?.message;
           toast.error(errorMessage);
         },
       }
@@ -96,7 +96,7 @@ const ProjectDetails = () => {
           toast.success("Project updated successfully");
         },
         onError: (error) => {
-          const errorMessage = error?.message;
+          const errorMessage = error?.response?.data?.message;
           toast.error(errorMessage);
         },
       }

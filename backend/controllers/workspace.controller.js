@@ -6,8 +6,8 @@ import jwt from "jsonwebtoken";
 import { sendEmail } from "./../libs/sendEmail.js";
 import { recordActivity } from "./../libs/index.js";
 import mongoose from "mongoose";
-import Task from './../models/task.model.js';
-import Comment from './../models/comment.model.js';
+import Task from "./../models/task.model.js";
+import Comment from "./../models/comment.model.js";
 import ActivityLog from "../models/activity.model.js";
 
 export const createWorkspace = async (req, res) => {
@@ -38,13 +38,9 @@ export const inviteUserToWorkspace = async (req, res) => {
       return res.status(404).json({ message: "Workspace not found" });
     }
 
-    const userMemberInfo = workspace.members.find(
-      (member) => member.user.toString() === req.user._id.toString()
-    );
-
-    if (!userMemberInfo || !["admin", "owner"].includes(userMemberInfo.role)) {
+    if (workspace.owner.toString() !== req.user._id.toString()) {
       return res.status(403).json({
-        message: "You are not authorized to invite members to this workspace",
+        message: "Only the workspace owner can invite members",
       });
     }
 
@@ -248,8 +244,8 @@ export const updateWorkspace = async (req, res) => {
     const { workspaceId } = req.params;
     const updates = req.body;
 
-    // Optional: whitelist fields that can be updated
-    const allowedUpdates = ["name", "description", "color", "members"];
+    // ✅ Only allow these fields to be updated
+    const allowedUpdates = ["name", "description", "color"];
     const filteredUpdates = {};
     for (const key of allowedUpdates) {
       if (updates[key] !== undefined) filteredUpdates[key] = updates[key];
@@ -259,18 +255,26 @@ export const updateWorkspace = async (req, res) => {
       return res.status(400).json({ message: "No valid fields to update" });
     }
 
-    // Find workspace and update
-    const workspace = await Workspace.findOneAndUpdate(
-      { _id: workspaceId },
-      { $set: filteredUpdates },
-      { new: true }
-    );
+    // Find workspace
+    const workspace = await Workspace.findById(workspaceId);
     if (!workspace) {
       return res.status(404).json({ message: "Workspace not found" });
     }
 
+    // ✅ Only owner can update workspace
+    if (workspace.owner.toString() !== req.user._id.toString()) {
+      return res
+        .status(403)
+        .json({ message: "Only the workspace owner can update the workspace" });
+    }
+
+    // Apply updates
+    Object.assign(workspace, filteredUpdates);
+    await workspace.save();
+
     return res.json(workspace);
   } catch (err) {
+    console.error(err);
     return res
       .status(500)
       .json({ message: "Error updating workspace", error: err.message });
@@ -279,7 +283,7 @@ export const updateWorkspace = async (req, res) => {
 
 export const transferWorkspace = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { workspaceId } = req.params;
     const { newOwnerEmail } = req.body;
 
     const newOwner = await User.findOne({ email: newOwnerEmail });
@@ -287,20 +291,46 @@ export const transferWorkspace = async (req, res) => {
       return res.status(404).json({ message: "New owner not found" });
     }
 
-    const workspace = await Workspace.findOneAndUpdate(
-      { _id: id, owner: req.userId },
-      { owner: newOwner._id },
-      { new: true }
-    );
-
+    const workspace = await Workspace.findById(workspaceId);
     if (!workspace) {
-      return res
-        .status(404)
-        .json({ message: "Workspace not found or unauthorized" });
+      return res.status(404).json({ message: "Workspace not found" });
     }
 
-    return res.json({ message: "Ownership transferred", workspace });
+    if (workspace.owner.toString() !== req.user._id.toString()) {
+      return res
+        .status(403)
+        .json({ message: "Only the workspace owner can transfer ownership" });
+    }
+
+    const memberIndex = workspace.members.findIndex(
+      (m) => m.user.toString() === newOwner._id.toString()
+    );
+    if (memberIndex === -1) {
+      return res
+        .status(400)
+        .json({ message: "New owner must be a member of the workspace first" });
+    }
+
+    workspace.members = workspace.members.map((m) => {
+      if (m.user.toString() === workspace.owner.toString()) {
+        return { ...m.toObject(), role: "admin" };
+      }
+      if (m.user.toString() === newOwner._id.toString()) {
+        return { ...m.toObject(), role: "owner" };
+      }
+      return m;
+    });
+
+    workspace.owner = newOwner._id;
+
+    await workspace.save();
+
+    return res.json({
+      message: "Ownership transferred successfully",
+      workspace,
+    });
   } catch (err) {
+    console.error(err);
     return res
       .status(500)
       .json({ message: "Error transferring workspace", error: err.message });
@@ -570,59 +600,58 @@ export const deleteWorkspace = async (req, res) => {
   try {
     const { workspaceId } = req.params;
 
-    // Find and delete the workspace
-    const workspace = await Workspace.findOneAndDelete(
-      { _id: workspaceId },
-      { session }
-    );
-
+    const workspace = await Workspace.findById(workspaceId).session(session);
     if (!workspace) {
       await session.abortTransaction();
       session.endSession();
       return res.status(404).json({ message: "Workspace not found" });
     }
 
-    // Find all projects in this workspace
+    if (workspace.owner.toString() !== req.user._id.toString()) {
+      await session.abortTransaction();
+      session.endSession();
+      return res
+        .status(403)
+        .json({
+          message: "Only the workspace owner can delete this workspace",
+        });
+    }
+
     const projects = await Project.find({ workspace: workspaceId }, null, {
       session,
     });
 
-    // Collect all task IDs under these projects
     const taskIds = await Task.find(
       { project: { $in: projects.map((p) => p._id) } },
       "_id",
       { session }
     ).then((tasks) => tasks.map((t) => t._id));
 
-    // Delete tasks
     await Task.deleteMany({ _id: { $in: taskIds } }, { session });
 
-    // Delete comments associated with tasks
     await Comment.deleteMany({ task: { $in: taskIds } }, { session });
 
-    // Delete projects
     await Project.deleteMany({ workspace: workspaceId }, { session });
 
-    // Delete activity logs for workspace, projects, tasks, comments
     await ActivityLog.deleteMany(
       {
         $or: [
-          { resourseType: "Workspace", resourseId: workspaceId },
+          { resourceType: "Workspace", resourceId: workspaceId },
           {
-            resourseType: "Project",
-            resourseId: { $in: projects.map((p) => p._id) },
+            resourceType: "Project",
+            resourceId: { $in: projects.map((p) => p._id) },
           },
-          { resourseType: "Task", resourseId: { $in: taskIds } },
-          { resourseType: "Comment", resourseId: { $in: taskIds } }, 
+          { resourceType: "Task", resourceId: { $in: taskIds } },
+          { resourceType: "Comment", resourceId: { $in: taskIds } },
         ],
       },
       { session }
     );
 
-    // Delete workspace invites
     await WorkspaceInvite.deleteMany({ workspaceId }, { session });
 
-    // Commit transaction
+    await Workspace.deleteOne({ _id: workspaceId }, { session });
+
     await session.commitTransaction();
     session.endSession();
 
