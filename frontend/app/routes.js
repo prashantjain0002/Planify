@@ -10,7 +10,7 @@ export default [
     route("verify-email", "routes/auth/VerifyEmail.jsx"),
   ]),
 
-  layout("routes/dashboard/DashboardLayout.jsx", [
+  layout("routes/dashboard/DashBoardLayout.jsx", [
     route("dashboard", "routes/dashboard/Dashboard.jsx"),
     route("workspaces", "routes/dashboard/workspaces/Workspaces.jsx"),
     route(
