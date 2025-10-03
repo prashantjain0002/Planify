@@ -36,7 +36,7 @@ const StatisticsCharts = ({
   workspaceProductivityData,
 }) => {
   const { theme } = useTheme();
-  
+
   return (
     <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mb-8">
       <Card className={"lg:col-span-2"}>
@@ -128,9 +128,11 @@ const StatisticsCharts = ({
             <ChartContainer
               className={"h-[300px] flex justify-center"}
               config={{
-                Completed: { color: "#10b981" },
-                "In Progress": { color: "#f59e0b" },
-                Planning: { color: "#3b82f6" },
+                Completed: { color: "#10b981" }, 
+                "In Progress": { color: "#f59e0b" }, 
+                Planning: { color: "#3b82f6" }, 
+                "On Hold": { color: "#6b7280" }, 
+                Cancelled: { color: "#ef4444" }, 
               }}
             >
               <PieChart>

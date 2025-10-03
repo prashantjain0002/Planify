@@ -19,51 +19,47 @@ import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "@/lib/provider/authContext";
 import { useState, useEffect } from "react";
 
-const COLORS = [
-  "#FF5733",
-  "#33C1FF",
-  "#28A745",
-  "#FFC300",
-  "#8E44AD",
-  "#E67E22",
-  "#2ECC71",
-  "#34495E",
-];
+export function meta({}) {
+  return [
+    { title: "Planify" },
+    { name: "description", content: "Welcome to Planify" },
+  ];
+}
 
 const features = [
   {
     icon: <Rocket className="w-10 h-10 text-white" />,
-    color: COLORS[0],
+    color: '#FF5733',
     title: "Boost Productivity",
     desc: "Streamline workflows with smart task management.",
   },
   {
     icon: <Users className="w-10 h-10 text-white" />,
-    color: COLORS[1],
+    color: '#33C1FF',
     title: "Seamless Collaboration",
     desc: "Work together in real-time effortlessly.",
   },
   {
     icon: <Calendar className="w-10 h-10 text-white" />,
-    color: COLORS[2],
+    color: '#28A745',
     title: "Stay On Schedule",
     desc: "Deadlines & reminders keep you on track.",
   },
   {
     icon: <Shield className="w-10 h-10 text-white" />,
-    color: COLORS[4],
+    color: '#FFC300',
     title: "Secure & Reliable",
     desc: "Enterprise-grade security for your data.",
   },
   {
     icon: <CheckCircle className="w-10 h-10 text-white" />,
-    color: COLORS[5],
+    color: '#E67E22',
     title: "Easy to Use",
     desc: "Clean, intuitive interface. Zero learning curve.",
   },
   {
     icon: <Workflow className="w-10 h-10 text-white" />,
-    color: COLORS[7],
+    color: '#34495E',
     title: "Powerful Insights",
     desc: "Visualize progress with rich analytics.",
   },
@@ -73,21 +69,21 @@ const works = [
   {
     step: "1",
     icon: <FolderPlus className="w-12 h-12 text-white" />,
-    color: COLORS[0],
+    color: '#FF5733',
     title: "Create Workspace",
     desc: "Set up your workspace in minutes and invite your team.",
   },
   {
     step: "2",
     icon: <ListChecks className="w-12 h-12 text-white" />,
-    color: COLORS[1],
+    color: '#33C1FF',
     title: "Organize Projects",
     desc: "Group tasks into projects and set deadlines easily.",
   },
   {
     step: "3",
     icon: <BarChart2 className="w-12 h-12 text-white" />,
-    color: COLORS[2],
+    color: '#28A745',
     title: "Track Progress",
     desc: "Monitor real-time progress with analytics & insights.",
   },
@@ -113,7 +109,7 @@ export default function Home() {
     >
       {/* Header */}
       <header className="w-full py-4 px-8 flex justify-between items-center bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50 transition-colors duration-500">
-        <h1 className="text-3xl font-extrabold" style={{ color: COLORS[0] }}>
+        <h1 className="text-3xl font-extrabold" style={{ color: '#FF5733' }}>
           Planify
         </h1>
         <div className="flex gap-4 items-center">
@@ -138,7 +134,7 @@ export default function Home() {
           <Link to="/sign-up">
             <Button
               className="text-white hover:scale-105 transition-transform"
-              style={{ backgroundColor: COLORS[1] }}
+              style={{ backgroundColor: '#33C1FF' }}
             >
               Get Started
             </Button>
@@ -156,7 +152,7 @@ export default function Home() {
         >
           <h2 className="text-5xl md:text-6xl font-extrabold leading-tight">
             Organize. Collaborate. <br />
-            <span style={{ color: COLORS[2] }}>Plan Smarter.</span>
+            <span style={{ color: '#28A745' }}>Plan Smarter.</span>
           </h2>
           <p className="mt-6 text-lg">
             Planify helps teams manage projects, track tasks, and achieve goals
@@ -168,7 +164,7 @@ export default function Home() {
               <Button
                 size="lg"
                 className="text-white hover:scale-105 transition-transform"
-                style={{ backgroundColor: COLORS[2] }}
+                style={{ backgroundColor: '#28A745' }}
               >
                 Get Started Free
               </Button>

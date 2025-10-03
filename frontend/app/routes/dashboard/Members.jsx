@@ -20,6 +20,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useWorkspace } from "@/lib/provider/workspaceContext";
 import NoDataFound from "@/components/NoDataFound";
 
+export function meta({}) {
+  return [
+    { title: "Members - Planify" },
+    { name: "description", content: "Members details current workspace" },
+  ];
+}
+
 const Members = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialSearch = searchParams.get("search") || "";

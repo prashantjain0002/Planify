@@ -36,6 +36,14 @@ import { toast } from "sonner";
 import Loader from "@/components/Loader";
 import NoDataFound from "@/components/NoDataFound";
 
+
+export function meta({}) {
+  return [
+    { title: "Settings - Planify" },
+    { name: "description", content: "Workspace Settings - Planify" },
+  ];
+}
+
 export const colorOptions = [
   "#FF5733",
   "#33C1FF",

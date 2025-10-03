@@ -17,6 +17,14 @@ import { format } from "date-fns";
 import { truncateDescription } from "@/lib/utils";
 import { motion } from "framer-motion";
 
+
+export function meta({}) {
+  return [
+    { title: "Workspace - Planify" },
+    { name: "description", content: "Workspace Details - Planify" },
+  ];
+}
+
 const Workspaces = () => {
   const [isCreatingWorkspace, setIsCreatingWorkspace] = useState(false);
   const { data: workspaces, isLoading } = useGetWorkspacesQuery();

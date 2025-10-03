@@ -28,6 +28,13 @@ import {
   useGetWorkspaceQuery,
 } from "@/hooks/useWorkspace";
 
+export function meta({}) {
+  return [
+    { title: "Tasks - Planify" },
+    { name: "description", content: "Task Details - Planify" },
+  ];
+}
+
 const containerVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: {

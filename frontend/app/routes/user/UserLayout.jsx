@@ -1,6 +1,13 @@
 import React from "react";
 import { Outlet } from "react-router";
 
+export function meta({}) {
+  return [
+    { title: "Profile - Planify" },
+    { name: "description", content: "User Profile - Planify" },
+  ];
+}
+
 const UserLayout = () => {
   return (
     <div className="container max-w-3xl mx-auto py-8 md:py-12">

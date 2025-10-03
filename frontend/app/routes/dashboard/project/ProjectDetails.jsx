@@ -38,6 +38,13 @@ import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
+export function meta({}) {
+  return [
+    { title: "Project - Planify" },
+    { name: "description", content: "Project Details - Planify" },
+  ];
+}
+
 const ProjectDetails = () => {
   const [isCreateTask, setIsCreateTask] = useState(false);
   const [taskFilters, setTaskFilters] = useState({});

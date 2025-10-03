@@ -180,11 +180,11 @@ const InviteMemberDialog = ({ isOpen, onOpenChange, workspaceId }) => {
                 >
                   {linkCopied ? (
                     <>
-                      <Check className="h-4 w-4" /> Copied
+                      <Copy className="h-4 w-4" /> Copy
                     </>
                   ) : (
                     <>
-                      <Copy className="h-4 w-4" /> Copy
+                      <Check className="h-4 w-4" /> Copied
                     </>
                   )}
                 </Button>

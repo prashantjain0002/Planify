@@ -8,6 +8,13 @@ import { useParams } from "react-router";
 import { motion } from "framer-motion";
 import InviteMemberDialog from "@/components/workspace/InviteMemberDialog";
 
+export function meta({}) {
+  return [
+    { title: "Workspace - Planify" },
+    { name: "description", content: "Workspace Details - Planify" },
+  ];
+}
+
 const containerVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: {

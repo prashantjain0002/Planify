@@ -34,6 +34,14 @@ import { Link, useSearchParams } from "react-router";
 import { motion } from "framer-motion";
 import NoDataFound from "@/components/NoDataFound";
 
+
+export function meta({}) {
+  return [
+    { title: "My Tasks - Planify" },
+    { name: "description", content: "My Tasks details" },
+  ];
+}
+
 const MyTasks = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 

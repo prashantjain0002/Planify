@@ -504,6 +504,12 @@ export const getWorkspaceStats = async (req, res) => {
               case "To Do":
                 dayData.toDo++;
                 break;
+              case "Cancelled":
+                dayData.cancelled++;
+                break;
+              case "On Hold":
+                dayData.onHold++;
+                break;
             }
           }
         }
@@ -511,9 +517,11 @@ export const getWorkspaceStats = async (req, res) => {
     }
 
     const projectStatusData = [
-      { name: "Completed", value: 0, color: "#10b981" },
-      { name: "In Progress", value: 0, color: "#f59e0b" },
-      { name: "Planning", value: 0, color: "#ef4444" },
+      { name: "Completed", value: 0, color: "#10b981" }, 
+      { name: "In Progress", value: 0, color: "#f59e0b" }, 
+      { name: "Planning", value: 0, color: "#3b82f6" }, 
+      { name: "Cancelled", value: 0, color: "#ef4444" }, 
+      { name: "On Hold", value: 0, color: "#6b7280" }, 
     ];
 
     for (const project of projects) {
@@ -526,6 +534,12 @@ export const getWorkspaceStats = async (req, res) => {
           break;
         case "Planning":
           projectStatusData[2].value++;
+          break;
+        case "Cancelled":
+          projectStatusData[3].value++;
+          break;
+        case "On Hold":
+          projectStatusData[4].value++;
           break;
       }
     }
@@ -610,11 +624,9 @@ export const deleteWorkspace = async (req, res) => {
     if (workspace.owner.toString() !== req.user._id.toString()) {
       await session.abortTransaction();
       session.endSession();
-      return res
-        .status(403)
-        .json({
-          message: "Only the workspace owner can delete this workspace",
-        });
+      return res.status(403).json({
+        message: "Only the workspace owner can delete this workspace",
+      });
     }
 
     const projects = await Project.find({ workspace: workspaceId }, null, {

@@ -4,6 +4,7 @@ import Project from "../models/project.model.js";
 import Task from "../models/task.model.js";
 import Workspace from "../models/workspace.model.js";
 import Comment from "./../models/comment.model.js";
+import User from './../models/user.model.js';
 
 export const createTask = async (req, res) => {
   try {
@@ -512,16 +513,27 @@ export const updateTaskAssignees = async (req, res) => {
       });
     }
 
-    const oldAssignees = task.assignees || [];
+    const oldAssigneesIds = task.assignees || [];
+    const newAssigneesIds = assignees || [];
 
-    task.assignees = assignees || [];
+    // Fetch user names for old assignees
+    const oldUsers = await User.find({ _id: { $in: oldAssigneesIds } });
+    const oldAssigneesNames = oldUsers.map((u) => u.name);
+
+    // Fetch user names for new assignees
+    const newUsers = await User.find({ _id: { $in: newAssigneesIds } });
+    const newAssigneesNames = newUsers.map((u) => u.name);
+
+    // Update task
+    task.assignees = newAssigneesIds;
     await task.save();
 
+    // Record activity with names
     if (typeof recordActivity === "function") {
       await recordActivity(req.user._id, "updated_task", "Task", taskId, {
-        description: `Updated task assignees from [${oldAssignees.join(
+        description: `Updated task assignees from [${oldAssigneesNames.join(
           ", "
-        )}] to [${assignees.join(", ")}]`,
+        )}] to [${newAssigneesNames.join(", ")}]`,
       });
     }
 

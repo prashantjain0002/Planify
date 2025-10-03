@@ -17,6 +17,13 @@ import { ArchiveRestore, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import NoDataFound from "@/components/NoDataFound";
 
+export function meta({}) {
+  return [
+    { title: "Archived Tasks - Planify" },
+    { name: "description", content: "Archived Tasks details - Planify" },
+  ];
+}
+
 const statusColors = {
   "In Progress": "bg-yellow-100 text-yellow-800",
   Completed: "bg-green-100 text-green-800",
