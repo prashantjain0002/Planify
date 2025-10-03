@@ -8,7 +8,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "../ui/dialog";
 import { Button } from "../ui/button";
 import {
@@ -26,6 +25,7 @@ import { cn } from "@/lib/utils";
 import { useCreateWorkspaceMutation } from "@/hooks/useWorkspace";
 import { toast } from "sonner";
 import { useNavigate } from "react-router";
+import { useWorkspace } from "@/lib/provider/workspaceContext"; // ✅ Import context
 
 export const colorOptions = [
   "#FF5733",
@@ -39,6 +39,7 @@ export const colorOptions = [
 ];
 
 const CreateWorkspace = ({ isCreatingWorkspace, setIsCreatingWorkspace }) => {
+  const { setSelectedWorkspace } = useWorkspace();
   const form = useForm({
     resolver: zodResolver(workspaceSchema),
     defaultValues: {
@@ -49,21 +50,20 @@ const CreateWorkspace = ({ isCreatingWorkspace, setIsCreatingWorkspace }) => {
   });
 
   const { mutate, isPending } = useCreateWorkspaceMutation();
-
   const navigate = useNavigate();
 
   const onSubmit = (data) => {
     mutate(data, {
-      onSuccess: (data) => {
+      onSuccess: (workspace) => {
         form.reset();
+        setSelectedWorkspace(workspace);
         setIsCreatingWorkspace(false);
         toast.success("Workspace created successfully");
-        navigate(`/workspaces/${data._id}`);
+        navigate(`/workspaces/${workspace._id}`);
       },
       onError: (error) => {
         const errorMessage = error?.response?.data?.message;
-        console.log(error);
-        toast.error(errorMessage);
+        toast.error(errorMessage || "Failed to create workspace");
       },
     });
   };
@@ -72,9 +72,9 @@ const CreateWorkspace = ({ isCreatingWorkspace, setIsCreatingWorkspace }) => {
     <Dialog
       open={isCreatingWorkspace}
       onOpenChange={setIsCreatingWorkspace}
-      modal={true}
+      modal
     >
-      <DialogContent className={"max-h-[80vh] overflow-y-auto"}>
+      <DialogContent className="max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create Workspace</DialogTitle>
         </DialogHeader>
@@ -127,15 +127,15 @@ const CreateWorkspace = ({ isCreatingWorkspace, setIsCreatingWorkspace }) => {
                     <div className="flex gap-2 items-center">
                       {colorOptions.map((color) => (
                         <div
+                          key={color}
+                          style={{ backgroundColor: color }}
                           className={cn(
                             "w-6 h-6 rounded-full cursor-pointer hover:opacity-80 transition-all duration-300",
                             field.value === color &&
                               "ring-2 ring-offset-2 ring-offset-background ring-blue-500"
                           )}
-                          key={color}
-                          style={{ backgroundColor: color }}
                           onClick={() => field.onChange(color)}
-                        ></div>
+                        />
                       ))}
                     </div>
                   </FormControl>

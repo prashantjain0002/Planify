@@ -17,12 +17,17 @@ export const WorkspaceProvider = ({ children }) => {
   // Save to localStorage whenever it changes
   useEffect(() => {
     if (selectedWorkspace) {
-      localStorage.setItem("selectedWorkspace", JSON.stringify(selectedWorkspace));
+      localStorage.setItem(
+        "selectedWorkspace",
+        JSON.stringify(selectedWorkspace)
+      );
     }
   }, [selectedWorkspace]);
 
   return (
-    <WorkspaceContext.Provider value={{ selectedWorkspace, setSelectedWorkspace }}>
+    <WorkspaceContext.Provider
+      value={{ selectedWorkspace, setSelectedWorkspace }}
+    >
       {children}
     </WorkspaceContext.Provider>
   );
